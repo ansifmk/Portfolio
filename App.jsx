@@ -56,7 +56,7 @@ const FloatingDockMobile = ({ items }) => {
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 hover:bg-green-100 shadow-lg transition-colors"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-green-900 hover:bg-green-100 shadow-lg transition-colors"
         >
           <Menu className="h-6 w-6 text-white" />
         </button>
@@ -199,14 +199,40 @@ import Profile from "./assets/profile.jpg";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
-    setIsVisible(true);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
   }, []);
 
   return (
     <section
       id="home"
+      ref={sectionRef}
       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24"
     >
       <div className="flex flex-col md:flex-row justify-center items-center max-w-5xl mx-auto gap-8 md:gap-16 w-full">
@@ -220,7 +246,7 @@ const Hero = () => {
             <img
               src={Profile}
               alt="Ansif"
-              className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover  shadow-2xl hover:shadow-green-500/50 hover:shadow-3xl transition-all duration-500 group-hover:scale-105"
+              className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover shadow-2xl hover:shadow-green-500/50 hover:shadow-3xl transition-all duration-500 group-hover:scale-105"
             />
           </div>
         </div>
@@ -229,12 +255,12 @@ const Hero = () => {
         <div className="text-center md:text-left flex-1">
           {/* Main heading */}
           <div
-            className={`transform transition-all duration-700 ease-out ${
+            className={`transform transition-all duration-1000 ease-out ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-8 opacity-0"
             }`}
-            style={{ transitionDelay: "200ms" }}
+            style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
           >
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-gray-200">
               Hi, I'm{" "}
@@ -258,13 +284,13 @@ const Hero = () => {
 
           {/* Social Links */}
           <div
-            className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-700 ease-out ${
+            className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-1000 ease-out ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-8 opacity-0"
             }`}
             style={{
-              transitionDelay: "500ms",
+              transitionDelay: isVisible ? "500ms" : "0ms",
               pointerEvents: isVisible ? "auto" : "none",
             }}
           >
@@ -300,7 +326,7 @@ const Hero = () => {
               className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417a9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
               </svg>
             </a>
           </div>
@@ -312,18 +338,42 @@ const Hero = () => {
 
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
   }, []);
 
   return (
     <section
       id="about"
+      ref={sectionRef}
       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
-      {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div
@@ -332,16 +382,13 @@ const About = () => {
         ></div>
       </div>
 
-      {/* Main content container */}
       <div className="relative z-10 max-w-5xl mx-auto w-full">
         <div
-          className={`backdrop-blur-sm bg-green-950/30 border border-green-100/30 rounded-3xl p-8 md:p-12 shadow-[0_20px_80px_rgba(34,197,94,0.15)] transition-all duration-1000 ${
+          className={`backdrop-blur-sm bg-green-950/30 border border-green-100/30 rounded-3xl p-8 md:p-12 shadow-[0_0px_0px_rgba(34,197,94,0.15)] transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          {/* Header section */}
           <div className="mb-10 relative">
-            {/* Left accent line */}
             <div
               className={`absolute -left-4 md:-left-8 top-0 w-1 bg-gradient-to-b from-green-100 to-green-900 rounded-full transition-all duration-1000 ${
                 isVisible ? "h-full" : "h-0"
@@ -349,28 +396,15 @@ const About = () => {
             ></div>
 
             {/* Title */}
-            <h2
-              className={`text-5xl md:text-7xl font-extrabold text-cyan-800 tracking-wider drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] mb-3 transition-all duration-1000 ${
-                isVisible
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 -translate-x-10"
-              }`}
-              style={{
-                WebkitTextStroke: "2px rgba(9, 36, 81, 1)",
-                paintOrder: "stroke fill",
-                textShadow:
-                  "0 0 30px rgba(2, 36, 80, 0.3), 0 0 60px rgba(189, 189, 189, 0.2)",
-              }}
-            >
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-900 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
               About Me
             </h2>
 
             {/* Underline accent */}
             <div
-              className={`h-1 w-24 bg-gradient-to-r from-green-400 to-green-900 rounded-full transition-all duration-1000 ${
+              className={`h-1 w-24 bg-gradient-to-r from-green-100 to-green-900 rounded-full transition-all duration-1000 ${
                 isVisible ? "w-24 opacity-100" : "w-0 opacity-0"
               }`}
-              style={{ transitionDelay: "400ms" }}
             ></div>
           </div>
 
@@ -379,42 +413,43 @@ const About = () => {
             className={`space-y-6 transition-all duration-1000 ${
               isVisible ? "opacity-100" : "opacity-0"
             }`}
-            style={{ transitionDelay: "500ms" }}
+            style={{ transitionDelay: isVisible ? "500ms" : "0ms" }}
           >
-            {/* First paragraph */}
             <p className="text-lg md:text-xl text-gray-200 leading-relaxed font-light">
-              I am a{" "}
+              Hello! I’m Ansif MK, a{" "}
               <span className="text-green-400 font-semibold">
-                passionate web developer
+                Full Stack Web Developer{" "}
               </span>{" "}
-              with a keen interest in building responsive and user-friendly web
-              applications. I enjoy solving complex problems and continuously
-              learning new technologies to improve my skills and stay ahead in
-              this dynamic industry.
+              specializing in React, Redux, .NET, and modern frontend and
+              backend technologies. I have strong expertise in HTML, CSS,
+              JavaScript, React, Redux, Bootstrap, Tailwind CSS, C#, .NET, SQL,
+              ADO.NET, and Entity Framework. With hands-on experience in
+              developing responsive, accessible, and scalable web applications,
+              I focus on writing clean, maintainable code and building
+              user-centric interfaces that ensure seamless performance across
+              devices.
             </p>
 
-            {/* Second paragraph */}
             <p className="text-lg md:text-xl text-gray-200 leading-relaxed font-light">
-              My focus is on{" "}
-              <span className="text-green-400 font-semibold">clean code</span>,{" "}
-              <span className="text-green-400 font-semibold">
-                performance optimization
-              </span>
-              , and delivering seamless user experiences. I thrive in
-              collaborative environments where I can contribute and grow as a
-              developer, turning ideas into elegant solutions.
+              More <span className="text-green-400 font-semibold">About </span>,{" "}
+              <span className="text-green-400 font-semibold">Me</span>
+              Along with my technical expertise, I possess strong presentation
+              and communication skills. I’m a self-motivated learner who
+              continuously explores new tools, frameworks, and technologies to
+              stay ahead in the fast-evolving web development ecosystem. I have
+              completed my Bachelor of Computer Applications (BCA) from Calicut
+              University. That’s a brief overview of my professional journey —
+              thank you for reading!
             </p>
 
-            {/* Skills grid */}
             <div
               className={`grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 transition-all duration-1000 ${
                 isVisible
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-5"
               }`}
-              style={{ transitionDelay: "700ms" }}
+              style={{ transitionDelay: isVisible ? "700ms" : "0ms" }}
             >
-              {/* Innovation card */}
               <div className="group bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/30 rounded-xl p-6 hover:border-green-400/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] hover:scale-105 cursor-pointer">
                 <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">
                   💡
@@ -461,10 +496,7 @@ const About = () => {
 const Skills = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [animatedSkills, setAnimatedSkills] = useState({});
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  const sectionRef = useRef(null);
 
   const skills = [
     {
@@ -526,21 +558,48 @@ const Skills = () => {
   ];
 
   useEffect(() => {
-    if (isVisible) {
-      skills.forEach((skill, index) => {
-        setTimeout(() => {
-          setAnimatedSkills((prev) => ({
-            ...prev,
-            [skill.name]: true,
-          }));
-        }, index * 100);
-      });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            // Reset and animate skills when entering viewport
+            setAnimatedSkills({});
+            skills.forEach((skill, index) => {
+              setTimeout(() => {
+                setAnimatedSkills((prev) => ({
+                  ...prev,
+                  [skill.name]: true,
+                }));
+              }, index * 100);
+            });
+          } else {
+            setIsVisible(false);
+            setAnimatedSkills({});
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
-  }, [isVisible]);
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section
       id="skills"
+      ref={sectionRef}
       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
       {/* Animated background blobs */}
@@ -560,13 +619,10 @@ const Skills = () => {
           }`}
         >
           <h2
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-green-400 tracking-wider mb-4 drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
-            style={{
-              WebkitTextStroke: "2px rgba(34, 197, 94, 0.5)",
-              paintOrder: "stroke fill",
-              textShadow:
-                "0 0 30px rgba(34, 197, 94, 0.3), 0 0 60px rgba(34, 197, 94, 0.2)",
-            }}
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold 
+               bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 
+               bg-clip-text text-transparent 
+               drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
           >
             My Skills
           </h2>
@@ -575,7 +631,7 @@ const Skills = () => {
             className={`h-1 w-32 bg-gradient-to-r from-green-100 via-green-400 to-green-900 rounded-full mx-auto transform transition-all duration-1000 ${
               isVisible ? "w-32 opacity-100" : "w-0 opacity-0"
             }`}
-            style={{ transitionDelay: "200ms" }}
+            style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
           ></div>
 
           <p className="text-gray-400 mt-6 text-lg md:text-xl">
@@ -657,7 +713,7 @@ const Skills = () => {
           className={`text-center mt-16 transform transition-all duration-1000 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
-          style={{ transitionDelay: "500ms" }}
+          style={{ transitionDelay: isVisible ? "500ms" : "0ms" }}
         >
           <p className="text-gray-400 text-lg mb-6">
             Always learning and expanding my toolkit
@@ -679,24 +735,35 @@ import { ArrowRight } from "lucide-react";
 const Projects = () => {
   const [isVisible, setIsVisible] = useState({});
   const [hoveredId, setHoveredId] = useState(null);
+  const observerRef = useRef(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const id = entry.target.id;
           if (entry.isIntersecting) {
-            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }));
+            setIsVisible((prev) => ({ ...prev, [id]: true }));
+          } else {
+            setIsVisible((prev) => ({ ...prev, [id]: false }));
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.2, rootMargin: "0px" }
     );
 
-    document.querySelectorAll(".animate-on-scroll").forEach((el) => {
-      observer.observe(el);
+    const elements = document.querySelectorAll(".animate-on-scroll");
+    elements.forEach((el) => {
+      if (observerRef.current) {
+        observerRef.current.observe(el);
+      }
     });
 
-    return () => observer.disconnect();
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
   }, []);
 
   const projects = [
@@ -705,7 +772,7 @@ const Projects = () => {
       title: "E-Commerce Platform Apple Cart",
       description:
         "Full-stack shopping experience with secure payments and order tracking.",
-      image: "Screenshot 2025-10-16 123836.png",
+      image: "Screenshot 2025-10-16 124527.png",
       link: "https://applecartecom.vercel.app",
       tech: "React • Tailwind • Firebase",
     },
@@ -788,16 +855,13 @@ const Projects = () => {
             transform: isVisible.header ? "translateY(0)" : "translateY(40px)",
           }}
         >
-          <span className="text-green-400 font-semibold text-sm uppercase tracking-wider animate-pulse">
-            Portfolio
-          </span>
           <h2
-            className="text-5xl md:text-7xl font-extrabold text-green-400 tracking-wider drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] mb-4 cursor-default hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-green-300 hover:to-cyan-300 transition-all duration-500"
+            className="text-5xl md:text-7xl font-extrabold text-cyan-800 tracking-wider drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] mb-4 cursor-default hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-cyan-00 hover:to-cyan-300 transition-all duration-500"
             style={{
-              WebkitTextStroke: "2px rgba(34, 197, 94, 0.5)",
+              WebkitTextStroke: "2px rgba(157, 148, 148, 0.5)",
               paintOrder: "stroke fill",
               textShadow:
-                "0 0 30px rgba(34, 197, 94, 0.3), 0 0 60px rgba(34, 197, 94, 0.2)",
+                "0 0 30px rgba(0, 0, 0, 0.3), 0 0 60px rgba(34, 197, 94, 0.2)",
             }}
           >
             My Projects
@@ -969,6 +1033,36 @@ import { Toaster, toast } from "react-hot-toast";
 
 export const Contact = () => {
   const form = useRef();
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -991,39 +1085,10 @@ export const Contact = () => {
   return (
     <section
       id="contact"
+      ref={sectionRef}
       className="min-h-screen bg-gradient-to-r from-black to-green-950 py-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden"
     >
       <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
         @keyframes inputFocus {
           0% {
             border-bottom: 2px solid #10b981;
@@ -1041,15 +1106,6 @@ export const Contact = () => {
             box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
           }
         }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.8s ease-out;
-        }
-        .animate-slide-in-right {
-          animation: slideInRight 0.9s ease-out;
-        }
-        .animate-slide-in-left {
-          animation: slideInLeft 0.8s ease-out;
-        }
         .input-animate:focus {
           animation: inputFocus 0.3s ease-out;
         }
@@ -1063,9 +1119,15 @@ export const Contact = () => {
       <div className="w-full max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Side - Text */}
-          <div className="text-center lg:text-left animate-slide-in-left">
+          <div
+            className={`text-center lg:text-left transition-all duration-1000 ease-out ${
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-20"
+            }`}
+          >
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Get In <span className="text-emerald-500">Touch</span>
+              Get In <span className="text-emerald-200">Touch</span>
             </h2>
             <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
               Let's create something amazing together
@@ -1073,13 +1135,25 @@ export const Contact = () => {
           </div>
 
           {/* Right Side - Form */}
-          <div className="animate-slide-in-right">
+          <div
+            className={`transition-all duration-1000 ease-out ${
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-20"
+            }`}
+          >
             <div className="bg-white rounded-3xl p-5 sm:p-10 lg:p-4 shadow-3xl border-l-8 border-emerald-500 hover:shadow-3xl transition-all duration-300">
               <form ref={form} onSubmit={sendEmail} className="space-y-8">
                 {/* Name Input */}
                 <div
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: "0.1s" }}
+                  className={`transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "200ms" : "0ms",
+                  }}
                 >
                   <label
                     htmlFor="user_name"
@@ -1093,14 +1167,20 @@ export const Contact = () => {
                     name="user_name"
                     placeholder=""
                     required
-                    className="input-animate w-full rounded-3xl px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
+                    className="input-animate w-full rounded-2xl px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
                   />
                 </div>
 
                 {/* Email Input */}
                 <div
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: "0.2s" }}
+                  className={`transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "300ms" : "0ms",
+                  }}
                 >
                   <label
                     htmlFor="user_email"
@@ -1114,14 +1194,20 @@ export const Contact = () => {
                     name="user_email"
                     placeholder=""
                     required
-                    className="input-animate rounded-3xl w-full px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
+                    className="input-animate rounded-2xl w-full px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
                   />
                 </div>
 
                 {/* Message Textarea */}
                 <div
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: "0.3s" }}
+                  className={`transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "400ms" : "0ms",
+                  }}
                 >
                   <label
                     htmlFor="message"
@@ -1135,14 +1221,19 @@ export const Contact = () => {
                     rows="5"
                     placeholder=""
                     required
-                    className="input-animate rounded-3xl w-full px-0 py-3 bg-transparent  shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 resize-none transition-all duration-300 text-base"
+                    className="input-animate rounded-2xl w-full px-0 py-3 bg-transparent  shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 resize-none transition-all duration-300 text-base"
                   ></textarea>
                 </div>
 
-                {/* Submit Button */}
                 <div
-                  className="flex justify-center sm:justify-end animate-fade-in-up"
-                  style={{ animationDelay: "0.4s" }}
+                  className={`flex justify-center sm:justify-end transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "500ms" : "0ms",
+                  }}
                 >
                   <button
                     type="submit"
@@ -1159,6 +1250,7 @@ export const Contact = () => {
     </section>
   );
 };
+
 export default function App() {
   return (
     <>
