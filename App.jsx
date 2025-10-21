@@ -169,7 +169,7 @@ function IconContainer({ mouseX, title, icon, href }) {
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-cyan-900 hover:bg-green-900 transition-colors"
+        className="relative flex aspect-square items-center justify-center rounded-full bg-green-900 hover:bg-cyan-900 transition-colors"
       >
         <AnimatePresence>
           {hovered && (
@@ -615,10 +615,7 @@ const Skills = () => {
           }`}
         >
           <h2
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold 
-               bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 
-               bg-clip-text text-transparent 
-               drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-300 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
           >
             My Skills
           </h2>
@@ -727,7 +724,6 @@ const Skills = () => {
 };
 
 import { ArrowRight } from "lucide-react";
-
 const Projects = () => {
   const [isVisible, setIsVisible] = useState({});
   const [hoveredId, setHoveredId] = useState(null);
@@ -777,7 +773,7 @@ const Projects = () => {
       title: "Goibibo Website",
       description:
         "Built a responsive frontend clone of the Goibibo travel website using HTML and CSS. Included key pages like home, hotel booking, flight booking, and login/signup.",
-      image: "Screenshot 2025-06-16 193816.png",
+      image:"\goibibo.jpg" ,
       link: "https://github.com/yourusername/project2",
       tech: "HTML • CSS • JavaScript",
     },
@@ -846,20 +842,11 @@ const Projects = () => {
         <div
           className="animate-on-scroll mb-20 transition-all duration-1000"
           id="header"
-          style={{
-            opacity: isVisible.header ? 1 : 0,
-            transform: isVisible.header ? "translateY(0)" : "translateY(40px)",
-          }}
+         
         >
           <h2
-            className="text-5xl md:text-7xl font-extrabold text-cyan-800 tracking-wider drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] mb-4 cursor-default hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-cyan-00 hover:to-cyan-300 transition-all duration-500"
-            style={{
-              WebkitTextStroke: "2px rgba(157, 148, 148, 0.5)",
-              paintOrder: "stroke fill",
-              textShadow:
-                "0 0 30px rgba(0, 0, 0, 0.3), 0 0 60px rgba(34, 197, 94, 0.2)",
-            }}
-          >
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
+         >
             My Projects
           </h2>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl">
@@ -1028,7 +1015,7 @@ import emailjs from "@emailjs/browser";
 import { Toaster, toast } from "react-hot-toast";
 
 export const Contact = () => {
-  const form = useRef();
+  const form = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -1062,6 +1049,8 @@ export const Contact = () => {
 
   const sendEmail = (e) => {
     e.preventDefault();
+
+    if (!form.current) return;
 
     emailjs
       .sendForm(
@@ -1110,9 +1099,16 @@ export const Contact = () => {
         }
       `}</style>
 
+      {/* Background Text "ANSIF" */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <h1 className="mt-95 text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[24rem] xl:text-[28rem] font-extrabold bg-gradient-to-t from-cyan-100 via-cyan-500 to-white bg-clip-text text-transparent opacity-8 select-none whitespace-nowrap">
+          ANSIF
+        </h1>
+      </div>
+
       <Toaster position="top-center" />
 
-      <div className="w-full max-w-6xl">
+      <div className="w-full max-w-6xl relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Side - Text */}
           <div
@@ -1123,7 +1119,7 @@ export const Contact = () => {
             }`}
           >
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Get In <span className="text-emerald-200">Touch</span>
+              Get In <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">Touch</span>
             </h2>
             <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
               Let's create something amazing together
@@ -1214,7 +1210,7 @@ export const Contact = () => {
                   <textarea
                     id="message"
                     name="message"
-                    rows="5"
+                    rows={5}
                     placeholder=""
                     required
                     className="input-animate rounded-2xl w-full px-0 py-3 bg-transparent  shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 resize-none transition-all duration-300 text-base"
@@ -1246,6 +1242,7 @@ export const Contact = () => {
     </section>
   );
 };
+
 
 export default function App() {
   return (
