@@ -280,9 +280,7 @@ const Hero = () => {
             </p>
           </div>
 
-          {/* Buttons and Social Links */}
 
-          {/* Social Links */}
           <div
             className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-1000 ease-out ${
               isVisible
@@ -294,7 +292,6 @@ const Hero = () => {
               pointerEvents: isVisible ? "auto" : "none",
             }}
           >
-            {/* GitHub */}
             <a
               href="https://github.com"
               target="_blank"
@@ -306,7 +303,6 @@ const Hero = () => {
               </svg>
             </a>
 
-            {/* LinkedIn */}
             <a
               href="https://linkedin.com"
               target="_blank"
