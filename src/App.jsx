@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { Home, User, Code, Briefcase, Mail, Menu } from "lucide-react";
 
 const Navbar = () => {
@@ -35,7 +41,7 @@ const Navbar = () => {
     <>
       {/* Desktop Floating Dock */}
       <FloatingDockDesktop items={navItems} />
-      
+
       {/* Mobile Floating Dock */}
       <FloatingDockMobile items={navItems} />
     </>
@@ -44,17 +50,17 @@ const Navbar = () => {
 
 const FloatingDockMobile = ({ items }) => {
   const [open, setOpen] = useState(false);
-  
+
   return (
     <div className="fixed top-4 right-4 z-50 block md:hidden">
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 hover:bg-green-100 shadow-lg transition-colors"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-green-900 hover:bg-green-100 shadow-lg transition-colors"
         >
           <Menu className="h-6 w-6 text-white" />
         </button>
-        
+
         <AnimatePresence>
           {open && (
             <motion.div
@@ -84,7 +90,9 @@ const FloatingDockMobile = ({ items }) => {
                     className="flex items-center gap-3 rounded-full bg-green-600 hover:bg-green-700 shadow-lg transition-colors pl-4 pr-5 py-2.5"
                   >
                     <div className="h-5 w-5 flex-shrink-0">{item.icon}</div>
-                    <span className="text-sm font-medium text-white whitespace-nowrap">{item.title}</span>
+                    <span className="text-sm font-medium text-white whitespace-nowrap">
+                      {item.title}
+                    </span>
                   </a>
                 </motion.div>
               ))}
@@ -98,7 +106,7 @@ const FloatingDockMobile = ({ items }) => {
 
 const FloatingDockDesktop = ({ items }) => {
   let mouseX = useMotionValue(Infinity);
-  
+
   return (
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
@@ -124,7 +132,11 @@ function IconContainer({ mouseX, title, icon, href }) {
   let heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
 
   let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
-  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
+  let heightTransformIcon = useTransform(
+    distance,
+    [-150, 0, 150],
+    [20, 40, 20]
+  );
 
   let width = useSpring(widthTransform, {
     mass: 0.1,
@@ -157,7 +169,7 @@ function IconContainer({ mouseX, title, icon, href }) {
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-cyan-900 hover:bg-green-900 transition-colors"
+        className="relative flex aspect-square items-center justify-center rounded-full bg-green-900 hover:bg-cyan-900 transition-colors"
       >
         <AnimatePresence>
           {hovered && (
@@ -182,34 +194,59 @@ function IconContainer({ mouseX, title, icon, href }) {
   );
 }
 
-
 // import { useState, useEffect } from 'react';
+import Profile from "./assets/profile.jpg";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
-    setIsVisible(true);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
   }, []);
 
   return (
     <section
       id="home"
+      ref={sectionRef}
       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24"
     >
       <div className="flex flex-col md:flex-row justify-center items-center max-w-5xl mx-auto gap-8 md:gap-16 w-full">
-        
         {/* Image Section */}
         <div className="flex-shrink-0">
           <div className="relative group">
             {/* Animated glow background */}
             <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-cyan-500 rounded-full opacity-30 blur-lg group-hover:opacity-50 transition-opacity duration-500 animate-pulse"></div>
-            
+
             {/* Image container */}
             <img
-              src="\WhatsApp Image 2025-10-16 at 12.36.37_543088d1.jpg"
+              src={Profile}
               alt="Ansif"
-              className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover  shadow-2xl hover:shadow-green-500/50 hover:shadow-3xl transition-all duration-500 group-hover:scale-105"
+              className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover shadow-2xl hover:shadow-green-500/50 hover:shadow-3xl transition-all duration-500 group-hover:scale-105"
             />
           </div>
         </div>
@@ -218,13 +255,15 @@ const Hero = () => {
         <div className="text-center md:text-left flex-1">
           {/* Main heading */}
           <div
-            className={`transform transition-all duration-700 ease-out ${
-              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            className={`transform transition-all duration-1000 ease-out ${
+              isVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
-            style={{ transitionDelay: '200ms' }}
+            style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
           >
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-gray-200">
-              Hi, I'm{' '}
+              Hi, I'm{" "}
               <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
                 Ansif
               </span>
@@ -235,21 +274,24 @@ const Hero = () => {
             </p>
 
             <p className="text-base md:text-lg text-gray-300 mb-8 max-w-2xl leading-relaxed">
-              I create elegant and efficient web solutions with a focus on user experience and clean code. Passionate about building responsive, modern web applications with the latest technologies.
+              I create elegant and efficient web solutions with a focus on user
+              experience and clean code. Passionate about building responsive,
+              modern web applications with the latest technologies.
             </p>
           </div>
 
-          {/* Buttons and Social Links */}
-        
 
-          {/* Social Links */}
           <div
-            className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-700 ease-out ${
-              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-1000 ease-out ${
+              isVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
-            style={{ transitionDelay: '500ms', pointerEvents: isVisible ? 'auto' : 'none' }}
+            style={{
+              transitionDelay: isVisible ? "500ms" : "0ms",
+              pointerEvents: isVisible ? "auto" : "none",
+            }}
           >
-            {/* GitHub */}
             <a
               href="https://github.com"
               target="_blank"
@@ -261,7 +303,6 @@ const Hero = () => {
               </svg>
             </a>
 
-            {/* LinkedIn */}
             <a
               href="https://linkedin.com"
               target="_blank"
@@ -281,7 +322,7 @@ const Hero = () => {
               className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417a9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
               </svg>
             </a>
           </div>
@@ -291,113 +332,154 @@ const Hero = () => {
   );
 };
 
-
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
   }, []);
 
   return (
     <section
       id="about"
+      ref={sectionRef}
       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
-      {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '700ms' }}></div>
+        <div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "700ms" }}
+        ></div>
       </div>
 
-      {/* Main content container */}
       <div className="relative z-10 max-w-5xl mx-auto w-full">
         <div
-          className={`backdrop-blur-sm bg-green-950/30 border border-green-100/30 rounded-3xl p-8 md:p-12 shadow-[0_20px_80px_rgba(34,197,94,0.15)] transition-all duration-1000 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          className={`backdrop-blur-sm bg-green-950/30 border border-green-100/30 rounded-3xl p-8 md:p-12 shadow-[0_0px_0px_rgba(34,197,94,0.15)] transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          {/* Header section */}
           <div className="mb-10 relative">
-            {/* Left accent line */}
             <div
               className={`absolute -left-4 md:-left-8 top-0 w-1 bg-gradient-to-b from-green-100 to-green-900 rounded-full transition-all duration-1000 ${
-                isVisible ? 'h-full' : 'h-0'
+                isVisible ? "h-full" : "h-0"
               }`}
             ></div>
 
             {/* Title */}
-            <h2
-              className={`text-5xl md:text-7xl font-extrabold text-cyan-800 tracking-wider drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] mb-3 transition-all duration-1000 ${
-                isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
-              }`}
-              style={{
-                WebkitTextStroke: '2px rgba(9, 36, 81, 1)',
-                paintOrder: 'stroke fill',
-                textShadow: '0 0 30px rgba(2, 36, 80, 0.3), 0 0 60px rgba(189, 189, 189, 0.2)'
-              }}
-            >
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-900 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
               About Me
             </h2>
 
             {/* Underline accent */}
             <div
-              className={`h-1 w-24 bg-gradient-to-r from-green-400 to-green-900 rounded-full transition-all duration-1000 ${
-                isVisible ? 'w-24 opacity-100' : 'w-0 opacity-0'
+              className={`h-1 w-24 bg-gradient-to-r from-green-100 to-green-900 rounded-full transition-all duration-1000 ${
+                isVisible ? "w-24 opacity-100" : "w-0 opacity-0"
               }`}
-              style={{ transitionDelay: '400ms' }}
             ></div>
           </div>
 
           {/* Content section */}
           <div
             className={`space-y-6 transition-all duration-1000 ${
-              isVisible ? 'opacity-100' : 'opacity-0'
+              isVisible ? "opacity-100" : "opacity-0"
             }`}
-            style={{ transitionDelay: '500ms' }}
+            style={{ transitionDelay: isVisible ? "500ms" : "0ms" }}
           >
-            {/* First paragraph */}
             <p className="text-lg md:text-xl text-gray-200 leading-relaxed font-light">
-              I am a <span className="text-green-400 font-semibold">passionate web developer</span> with a keen interest in building
-              responsive and user-friendly web applications. I enjoy solving
-              complex problems and continuously learning new technologies to
-              improve my skills and stay ahead in this dynamic industry.
+              Hello! I’m Ansif MK, a{" "}
+              <span className="text-green-400 font-semibold">
+                Full Stack Web Developer{" "}
+              </span>{" "}
+              specializing in React, Redux, .NET, and modern frontend and
+              backend technologies. I have strong expertise in HTML, CSS,
+              JavaScript, React, Redux, Bootstrap, Tailwind CSS, C#, .NET, SQL,
+              ADO.NET, and Entity Framework. With hands-on experience in
+              developing responsive, accessible, and scalable web applications,
+              I focus on writing clean, maintainable code and building
+              user-centric interfaces that ensure seamless performance across
+              devices.
             </p>
 
-            {/* Second paragraph */}
             <p className="text-lg md:text-xl text-gray-200 leading-relaxed font-light">
-              My focus is on <span className="text-green-400 font-semibold">clean code</span>, <span className="text-green-400 font-semibold">performance optimization</span>, and delivering
-              seamless user experiences. I thrive in collaborative environments
-              where I can contribute and grow as a developer, turning ideas into elegant solutions.
+              More <span className="text-green-400 font-semibold">About </span>,{" "}
+              <span className="text-green-400 font-semibold">Me</span>
+              Along with my technical expertise, I possess strong presentation
+              and communication skills. I’m a self-motivated learner who
+              continuously explores new tools, frameworks, and technologies to
+              stay ahead in the fast-evolving web development ecosystem. I have
+              completed my Bachelor of Computer Applications (BCA) from Calicut
+              University. That’s a brief overview of my professional journey —
+              thank you for reading!
             </p>
 
-            {/* Skills grid */}
             <div
               className={`grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 transition-all duration-1000 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-5"
               }`}
-              style={{ transitionDelay: '700ms' }}
+              style={{ transitionDelay: isVisible ? "700ms" : "0ms" }}
             >
-              {/* Innovation card */}
               <div className="group bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/30 rounded-xl p-6 hover:border-green-400/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] hover:scale-105 cursor-pointer">
-                <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">💡</div>
-                <h3 className="text-green-300 font-bold text-lg mb-2">Innovation</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Creative problem solving and continuous learning</p>
+                <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">
+                  💡
+                </div>
+                <h3 className="text-green-300 font-bold text-lg mb-2">
+                  Innovation
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Creative problem solving and continuous learning
+                </p>
               </div>
 
               {/* Performance card */}
               <div className="group bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] hover:scale-105 cursor-pointer">
-                <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">⚡</div>
-                <h3 className="text-cyan-300 font-bold text-lg mb-2">Performance</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Optimized and efficient solutions</p>
+                <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">
+                  ⚡
+                </div>
+                <h3 className="text-cyan-300 font-bold text-lg mb-2">
+                  Performance
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Optimized and efficient solutions
+                </p>
               </div>
 
               {/* Focus card */}
               <div className="group bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/30 rounded-xl p-6 hover:border-green-400/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.2)] hover:scale-105 cursor-pointer">
-                <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">🎯</div>
+                <div className="text-4xl mb-3 transform group-hover:scale-125 transition-transform duration-300">
+                  🎯
+                </div>
                 <h3 className="text-green-300 font-bold text-lg mb-2">Focus</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">User-centric design approach</p>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  User-centric design approach
+                </p>
               </div>
             </div>
           </div>
@@ -407,15 +489,10 @@ const About = () => {
   );
 };
 
-
-
 const Skills = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [animatedSkills, setAnimatedSkills] = useState({});
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  const sectionRef = useRef(null);
 
   const skills = [
     {
@@ -423,109 +500,136 @@ const Skills = () => {
       level: 95,
       color: "from-orange-500 to-red-500",
       glow: "shadow-[0_0_30px_rgba(249,115,22,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
     },
     {
       name: "CSS3",
       level: 90,
       color: "from-blue-500 to-cyan-500",
       glow: "shadow-[0_0_30px_rgba(6,182,212,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg",
     },
     {
       name: "JavaScript",
       level: 88,
       color: "from-yellow-400 to-orange-500",
       glow: "shadow-[0_0_30px_rgba(250,204,21,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
     },
     {
       name: "React",
       level: 85,
       color: "from-cyan-400 to-blue-500",
       glow: "shadow-[0_0_30px_rgba(34,211,238,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
     },
     {
       name: "Tailwind CSS",
       level: 92,
       color: "from-sky-400 to-blue-600",
       glow: "shadow-[0_0_30px_rgba(56,189,248,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
     },
     {
       name: "Git",
       level: 87,
       color: "from-orange-600 to-red-600",
       glow: "shadow-[0_0_30px_rgba(234,88,12,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
     },
     {
       name: "Figma",
       level: 90,
       color: "from-pink-500 to-purple-600",
       glow: "shadow-[0_0_30px_rgba(217,70,239,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg"
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg",
     },
     {
       name: "Bootstrap",
       level: 85,
       color: "from-purple-700 to-indigo-700",
       glow: "shadow-[0_0_30px_rgba(111,66,193,0.3)]",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bootstrap/bootstrap-original.svg"
-    }
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bootstrap/bootstrap-original.svg",
+    },
   ];
 
   useEffect(() => {
-    if (isVisible) {
-      skills.forEach((skill, index) => {
-        setTimeout(() => {
-          setAnimatedSkills(prev => ({
-            ...prev,
-            [skill.name]: true
-          }));
-        }, index * 100);
-      });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            // Reset and animate skills when entering viewport
+            setAnimatedSkills({});
+            skills.forEach((skill, index) => {
+              setTimeout(() => {
+                setAnimatedSkills((prev) => ({
+                  ...prev,
+                  [skill.name]: true,
+                }));
+              }, index * 100);
+            });
+          } else {
+            setIsVisible(false);
+            setAnimatedSkills({});
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
-  }, [isVisible]);
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section
       id="skills"
+      ref={sectionRef}
       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
       <div className="relative z-10 max-w-7xl w-full">
         {/* Header section */}
         <div
           className={`text-center mb-16 transform transition-all duration-1000 ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
           <h2
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-green-400 tracking-wider mb-4 drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
-            style={{
-              WebkitTextStroke: '2px rgba(34, 197, 94, 0.5)',
-              paintOrder: 'stroke fill',
-              textShadow: '0 0 30px rgba(34, 197, 94, 0.3), 0 0 60px rgba(34, 197, 94, 0.2)'
-            }}
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-300 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
           >
             My Skills
           </h2>
-          
+
           <div
             className={`h-1 w-32 bg-gradient-to-r from-green-100 via-green-400 to-green-900 rounded-full mx-auto transform transition-all duration-1000 ${
-              isVisible ? 'w-32 opacity-100' : 'w-0 opacity-0'
+              isVisible ? "w-32 opacity-100" : "w-0 opacity-0"
             }`}
-            style={{ transitionDelay: '200ms' }}
+            style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
           ></div>
-          
-          <p className="text-gray-400 mt-6 text-lg md:text-xl">Technologies I work with</p>
+
+          <p className="text-gray-400 mt-6 text-lg md:text-xl">
+            Technologies I work with
+          </p>
         </div>
 
         {/* Skills grid */}
@@ -535,22 +639,23 @@ const Skills = () => {
               key={skill.name}
               className={`group relative transform transition-all duration-700 ${
                 animatedSkills[skill.name]
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-10 opacity-0'
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               {/* Card */}
               <div className="relative bg-gradient-to-br from-green-500/10 to-green-100/5 backdrop-blur-sm border border-green-500/30 hover:border-green-500/60 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 overflow-hidden group-hover:bg-green-500/5 h-full">
-                
                 {/* Glow effect */}
-                <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${skill.glow} blur-xl`}></div>
+                <div
+                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${skill.glow} blur-xl`}
+                ></div>
 
                 <div className="relative z-10 flex flex-col h-full">
                   {/* Icon */}
                   <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-4 mx-auto filter drop-shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
-                    <img 
-                      src={skill.logo} 
+                    <img
+                      src={skill.logo}
                       alt={`${skill.name} logo`}
                       className="w-full h-full object-contain"
                       loading="lazy"
@@ -566,7 +671,9 @@ const Skills = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Proficiency</span>
-                      <span className="text-green-400 font-semibold">{skill.level}%</span>
+                      <span className="text-green-400 font-semibold">
+                        {skill.level}%
+                      </span>
                     </div>
 
                     {/* Progress bar */}
@@ -574,8 +681,10 @@ const Skills = () => {
                       <div
                         className={`h-full bg-gradient-to-r ${skill.color} rounded-full relative transform origin-left transition-all duration-1000 ease-out`}
                         style={{
-                          width: animatedSkills[skill.name] ? `${skill.level}%` : '0%',
-                          transitionDelay: `${index * 50}ms`
+                          width: animatedSkills[skill.name]
+                            ? `${skill.level}%`
+                            : "0%",
+                          transitionDelay: `${index * 50}ms`,
                         }}
                       >
                         {/* Shimmer effect */}
@@ -595,14 +704,18 @@ const Skills = () => {
         {/* Bottom CTA */}
         <div
           className={`text-center mt-16 transform transition-all duration-1000 ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
-          style={{ transitionDelay: '500ms' }}
+          style={{ transitionDelay: isVisible ? "500ms" : "0ms" }}
         >
-          <p className="text-gray-400 text-lg mb-6">Always learning and expanding my toolkit</p>
+          <p className="text-gray-400 text-lg mb-6">
+            Always learning and expanding my toolkit
+          </p>
           <div className="inline-flex items-center gap-2 text-green-400 font-semibold hover:text-cyan-400 transition-colors duration-300 group cursor-pointer">
             <span>Explore my projects</span>
-            <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
+            <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
           </div>
         </div>
       </div>
@@ -610,60 +723,76 @@ const Skills = () => {
   );
 };
 
-import { ArrowRight } from 'lucide-react';
-
+import { ArrowRight } from "lucide-react";
 const Projects = () => {
   const [isVisible, setIsVisible] = useState({});
   const [hoveredId, setHoveredId] = useState(null);
+  const observerRef = useRef(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const id = entry.target.id;
           if (entry.isIntersecting) {
-            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }));
+            setIsVisible((prev) => ({ ...prev, [id]: true }));
+          } else {
+            setIsVisible((prev) => ({ ...prev, [id]: false }));
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.2, rootMargin: "0px" }
     );
 
-    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
-      observer.observe(el);
+    const elements = document.querySelectorAll(".animate-on-scroll");
+    elements.forEach((el) => {
+      if (observerRef.current) {
+        observerRef.current.observe(el);
+      }
     });
 
-    return () => observer.disconnect();
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
   }, []);
 
   const projects = [
     {
       id: 1,
       title: "E-Commerce Platform Apple Cart",
-      description: "Full-stack shopping experience with secure payments and order tracking.",
-      image: "\Screenshot 2025-10-16 123836.png",
+      description:
+        "Full-stack shopping experience with secure payments and order tracking.",
+      image: "Screenshot 2025-10-16 124527.png",
       link: "https://applecartecom.vercel.app",
-      tech: "React • Tailwind • Firebase"
+      tech: "React • Tailwind • Firebase",
     },
     {
       id: 2,
       title: "Goibibo Website",
-      description: "Built a responsive frontend clone of the Goibibo travel website using HTML and CSS. Included key pages like home, hotel booking, flight booking, and login/signup.",
-      image: "\Screenshot 2025-06-16 193816.png",
+      description:
+        "Built a responsive frontend clone of the Goibibo travel website using HTML and CSS. Included key pages like home, hotel booking, flight booking, and login/signup.",
+      image:"\goibibo.jpg" ,
       link: "https://github.com/yourusername/project2",
-      tech: "HTML • CSS • JavaScript"
+      tech: "HTML • CSS • JavaScript",
     },
     {
       id: 3,
       title: "Portfolio Website",
-      description: "This responsive portfolio site showcases my skills, projects, and contact info. Built with modern technologies and best practices.",
-      image: "\Screenshot 2025-10-16 124527.png",
+      description:
+        "This responsive portfolio site showcases my skills, projects, and contact info. Built with modern technologies and best practices.",
+      image: "Screenshot 2025-10-16 124527.png",
       link: "https://github.com/yourusername/project3",
-      tech: "React • Tailwind • Framer Motion"
-    }
+      tech: "React • Tailwind • Framer Motion",
+    },
   ];
 
   return (
-    <section id="projects" className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden">
+    <section
+      id="projects"
+      className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
+    >
       <style>{`
         @keyframes imageShine {
           0% { left: -100%; }
@@ -702,7 +831,10 @@ const Projects = () => {
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto w-full">
@@ -710,22 +842,16 @@ const Projects = () => {
         <div
           className="animate-on-scroll mb-20 transition-all duration-1000"
           id="header"
-          style={{
-            opacity: isVisible.header ? 1 : 0,
-            transform: isVisible.header ? 'translateY(0)' : 'translateY(40px)'
-          }}
+         
         >
-          <span className="text-green-400 font-semibold text-sm uppercase tracking-wider animate-pulse">Portfolio</span>
-          <h2 className="text-5xl md:text-7xl font-extrabold text-green-400 tracking-wider drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)] mb-4 cursor-default hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-green-300 hover:to-cyan-300 transition-all duration-500"
-            style={{
-              WebkitTextStroke: '2px rgba(34, 197, 94, 0.5)',
-              paintOrder: 'stroke fill',
-              textShadow: '0 0 30px rgba(34, 197, 94, 0.3), 0 0 60px rgba(34, 197, 94, 0.2)'
-            }}>
+          <h2
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"
+         >
             My Projects
           </h2>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl">
-            A collection of projects that showcase creativity and technical excellence
+            A collection of projects that showcase creativity and technical
+            excellence
           </p>
         </div>
 
@@ -736,35 +862,45 @@ const Projects = () => {
               key={project.id}
               id={`project-${project.id}`}
               className={`animate-on-scroll transition-all duration-1000 flex flex-col ${
-                index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
               } gap-8 sm:gap-12 items-center group`}
               onMouseEnter={() => setHoveredId(project.id)}
               onMouseLeave={() => setHoveredId(null)}
               style={{
                 opacity: isVisible[`project-${project.id}`] ? 1 : 0,
                 transform: isVisible[`project-${project.id}`]
-                  ? 'translateX(0)'
-                  : index % 2 === 0 ? 'translateX(-60px)' : 'translateX(60px)',
-                transitionDelay: '200ms'
+                  ? "translateX(0)"
+                  : index % 2 === 0
+                  ? "translateX(-60px)"
+                  : "translateX(60px)",
+                transitionDelay: "200ms",
               }}
             >
               {/* Image Section */}
               <div className="w-full md:w-1/2">
-                <div className={`relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-500 border border-green-500/20 ${
-                  hoveredId === project.id 
-                    ? 'shadow-green-500/70 border-green-500/60 scale-105 image-hover-shine' 
-                    : 'group-hover:shadow-green-500/50 group-hover:border-green-500/60'
-                }`}>
+                <div
+                  className={`relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-500 border border-green-500/20 ${
+                    hoveredId === project.id
+                      ? "shadow-green-500/70 border-green-500/60 scale-105 image-hover-shine"
+                      : "group-hover:shadow-green-500/50 group-hover:border-green-500/60"
+                  }`}
+                >
                   <img
                     src={project.image}
                     alt={project.title}
                     className={`w-full h-60 sm:h-80 object-cover transition-transform duration-700 ${
-                      hoveredId === project.id ? 'scale-110 rotate-2' : 'group-hover:scale-110 group-hover:rotate-2'
+                      hoveredId === project.id
+                        ? "scale-110 rotate-2"
+                        : "group-hover:scale-110 group-hover:rotate-2"
                     }`}
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${
-                    hoveredId === project.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                  }`}></div>
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${
+                      hoveredId === project.id
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  ></div>
                 </div>
               </div>
 
@@ -772,41 +908,47 @@ const Projects = () => {
               <div className="w-full md:w-1/2 space-y-4 sm:space-y-6">
                 <div>
                   {/* Project Badge */}
-                  <div className={`inline-block px-3 sm:px-4 py-1 rounded-full text-sm font-medium mb-3 sm:mb-4 transition-all duration-300 ${
-                    hoveredId === project.id
-                      ? 'bg-green-500/30 border border-green-500/70 text-green-200 scale-110 animate-bounce'
-                      : 'bg-green-500/10 border border-green-500/30 text-green-400 animate-bounce'
-                  }`}>
-                    Project {String(index + 1).padStart(2, '0')}
+                  <div
+                    className={`inline-block px-3 sm:px-4 py-1 rounded-full text-sm font-medium mb-3 sm:mb-4 transition-all duration-300 ${
+                      hoveredId === project.id
+                        ? "bg-green-500/30 border border-green-500/70 text-green-200 scale-110 animate-bounce"
+                        : "bg-green-500/10 border border-green-500/30 text-green-400 animate-bounce"
+                    }`}
+                  >
+                    Project {String(index + 1).padStart(2, "0")}
                   </div>
 
                   {/* Title */}
-                  <h3 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold transition-all duration-300 title-hover-glow cursor-default ${
-                    hoveredId === project.id
-                      ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-cyan-300 scale-105'
-                      : 'text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-cyan-400'
-                  }`}>
+                  <h3
+                    className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold transition-all duration-300 title-hover-glow cursor-default ${
+                      hoveredId === project.id
+                        ? "text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-cyan-300 scale-105"
+                        : "text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-cyan-400"
+                    }`}
+                  >
                     {project.title}
                   </h3>
 
                   {/* Description */}
-                  <p className={`text-base sm:text-lg leading-relaxed transition-all duration-300 ${
-                    hoveredId === project.id
-                      ? 'text-gray-200 translate-x-1'
-                      : 'text-gray-300'
-                  }`}>
+                  <p
+                    className={`text-base sm:text-lg leading-relaxed transition-all duration-300 ${
+                      hoveredId === project.id
+                        ? "text-gray-200 translate-x-1"
+                        : "text-gray-300"
+                    }`}
+                  >
                     {project.description}
                   </p>
 
                   {/* Tech Stack */}
                   <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
-                    {project.tech.split(' • ').map((tech, i) => (
+                    {project.tech.split(" • ").map((tech, i) => (
                       <span
                         key={i}
                         className={`px-2 sm:px-3 py-1 rounded-full text-sm font-mono transition-all duration-300 ${
                           hoveredId === project.id
-                            ? 'bg-green-500/40 border border-green-500/80 text-green-100 scale-110'
-                            : 'bg-green-500/10 border border-green-500/30 text-green-300 hover:border-green-500/60 hover:bg-green-500/20'
+                            ? "bg-green-500/40 border border-green-500/80 text-green-100 scale-110"
+                            : "bg-green-500/10 border border-green-500/30 text-green-300 hover:border-green-500/60 hover:bg-green-500/20"
                         }`}
                       >
                         {tech}
@@ -821,14 +963,18 @@ const Projects = () => {
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all duration-300 shadow-lg button-hover-glow transform ${
                       hoveredId === project.id
-                        ? 'bg-gradient-to-r from-green-400 to-cyan-400 text-black shadow-2xl shadow-green-500/70 scale-110 translate-x-3'
-                        : 'bg-gradient-to-r from-green-500 to-cyan-500 text-white hover:shadow-2xl hover:shadow-green-500/50 hover:translate-x-2'
+                        ? "bg-gradient-to-r from-green-400 to-cyan-400 text-black shadow-2xl shadow-green-500/70 scale-110 translate-x-3"
+                        : "bg-gradient-to-r from-green-500 to-cyan-500 text-white hover:shadow-2xl hover:shadow-green-500/50 hover:translate-x-2"
                     } group/btn text-sm sm:text-base`}
                   >
                     View Project
-                    <ArrowRight className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${
-                      hoveredId === project.id ? 'translate-x-2' : 'group-hover/btn:translate-x-1'
-                    }`} />
+                    <ArrowRight
+                      className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${
+                        hoveredId === project.id
+                          ? "translate-x-2"
+                          : "group-hover/btn:translate-x-1"
+                      }`}
+                    />
                   </a>
                 </div>
               </div>
@@ -842,7 +988,7 @@ const Projects = () => {
           id="cta"
           style={{
             opacity: isVisible.cta ? 1 : 0,
-            transform: isVisible.cta ? 'scale(1)' : 'scale(0.9)'
+            transform: isVisible.cta ? "scale(1)" : "scale(0.9)",
           }}
         >
           <div className="inline-block p-6 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-green-800/50 to-cyan-800/30 border border-green-500/30 shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-500 backdrop-blur-sm">
@@ -865,18 +1011,54 @@ const Projects = () => {
   );
 };
 
-
 import emailjs from "@emailjs/browser";
 import { Toaster, toast } from "react-hot-toast";
 
 export const Contact = () => {
-  const form = useRef();
+  const form = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   const sendEmail = (e) => {
     e.preventDefault();
 
+    if (!form.current) return;
+
     emailjs
-      .sendForm("service_gk5b2to", "template_mctveic", form.current, "zZU9D6KlQyEiFl5Es")
+      .sendForm(
+        "service_gk5b2to",
+        "template_mctveic",
+        form.current,
+        "zZU9D6KlQyEiFl5Es"
+      )
       .then(
         () => toast.success("Message sent successfully 🚀"),
         () => toast.error("Failed to send message ❌")
@@ -888,39 +1070,10 @@ export const Contact = () => {
   return (
     <section
       id="contact"
+      ref={sectionRef}
       className="min-h-screen bg-gradient-to-r from-black to-green-950 py-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden"
     >
       <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
         @keyframes inputFocus {
           0% {
             border-bottom: 2px solid #10b981;
@@ -938,15 +1091,6 @@ export const Contact = () => {
             box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
           }
         }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.8s ease-out;
-        }
-        .animate-slide-in-right {
-          animation: slideInRight 0.9s ease-out;
-        }
-        .animate-slide-in-left {
-          animation: slideInLeft 0.8s ease-out;
-        }
         .input-animate:focus {
           animation: inputFocus 0.3s ease-out;
         }
@@ -955,15 +1099,27 @@ export const Contact = () => {
         }
       `}</style>
 
+      {/* Background Text "ANSIF" */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <h1 className="mt-95 text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[24rem] xl:text-[28rem] font-extrabold bg-gradient-to-t from-cyan-100 via-cyan-500 to-white bg-clip-text text-transparent opacity-8 select-none whitespace-nowrap">
+          ANSIF
+        </h1>
+      </div>
+
       <Toaster position="top-center" />
 
-      <div className="w-full max-w-6xl">
+      <div className="w-full max-w-6xl relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          
           {/* Left Side - Text */}
-          <div className="text-center lg:text-left animate-slide-in-left">
+          <div
+            className={`text-center lg:text-left transition-all duration-1000 ease-out ${
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-20"
+            }`}
+          >
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Get In <span className="text-emerald-500">Touch</span>
+              Get In <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">Touch</span>
             </h2>
             <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
               Let's create something amazing together
@@ -971,13 +1127,30 @@ export const Contact = () => {
           </div>
 
           {/* Right Side - Form */}
-          <div className="animate-slide-in-right">
+          <div
+            className={`transition-all duration-1000 ease-out ${
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-20"
+            }`}
+          >
             <div className="bg-white rounded-3xl p-5 sm:p-10 lg:p-4 shadow-3xl border-l-8 border-emerald-500 hover:shadow-3xl transition-all duration-300">
               <form ref={form} onSubmit={sendEmail} className="space-y-8">
-                
                 {/* Name Input */}
-                <div className="animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                  <label htmlFor="user_name" className="block text-base font-semibold text-gray-800 mb-3">
+                <div
+                  className={`transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "200ms" : "0ms",
+                  }}
+                >
+                  <label
+                    htmlFor="user_name"
+                    className="block text-base font-semibold text-gray-800 mb-3"
+                  >
                     Name
                   </label>
                   <input
@@ -986,13 +1159,25 @@ export const Contact = () => {
                     name="user_name"
                     placeholder=""
                     required
-                    className="input-animate w-full rounded-3xl px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
+                    className="input-animate w-full rounded-2xl px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
                   />
                 </div>
 
                 {/* Email Input */}
-                <div className="animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                  <label htmlFor="user_email" className="block text-base font-semibold text-gray-800 mb-3">
+                <div
+                  className={`transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "300ms" : "0ms",
+                  }}
+                >
+                  <label
+                    htmlFor="user_email"
+                    className="block text-base font-semibold text-gray-800 mb-3"
+                  >
                     Email
                   </label>
                   <input
@@ -1001,27 +1186,47 @@ export const Contact = () => {
                     name="user_email"
                     placeholder=""
                     required
-                    className="input-animate rounded-3xl w-full px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
+                    className="input-animate rounded-2xl w-full px-0 py-3 bg-transparent shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 transition-all duration-300 text-base"
                   />
                 </div>
 
                 {/* Message Textarea */}
-                <div className="animate-fade-in-up" style={{animationDelay: '0.3s'}}>
-                  <label htmlFor="message" className="block text-base font-semibold text-gray-800 mb-3">
+                <div
+                  className={`transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "400ms" : "0ms",
+                  }}
+                >
+                  <label
+                    htmlFor="message"
+                    className="block text-base font-semibold text-gray-800 mb-3"
+                  >
                     Message
                   </label>
                   <textarea
                     id="message"
                     name="message"
-                    rows="5"
+                    rows={5}
                     placeholder=""
                     required
-                    className="input-animate rounded-3xl w-full px-0 py-3 bg-transparent  shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 resize-none transition-all duration-300 text-base"
+                    className="input-animate rounded-2xl w-full px-0 py-3 bg-transparent  shadow appearance-none border-b-2 border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-0 resize-none transition-all duration-300 text-base"
                   ></textarea>
                 </div>
 
-                {/* Submit Button */}
-                <div className="flex justify-center sm:justify-end animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+                <div
+                  className={`flex justify-center sm:justify-end transition-all duration-700 ease-out ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{
+                    transitionDelay: isVisible ? "500ms" : "0ms",
+                  }}
+                >
                   <button
                     type="submit"
                     className="btn-pulse bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-10 sm:px-12 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg text-base"
@@ -1037,6 +1242,8 @@ export const Contact = () => {
     </section>
   );
 };
+
+
 export default function App() {
   return (
     <>
