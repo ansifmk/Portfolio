@@ -318,10 +318,12 @@ const About = () => {
   }, []);
 
   return (
+        <BackgroundBeamsWithCollision       className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
+ >
+
     <section
       id="about"
       ref={sectionRef}
-      className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -439,6 +441,7 @@ const About = () => {
         </div>
       </div>
     </section>
+        </BackgroundBeamsWithCollision>
   );
 };
 
@@ -546,10 +549,11 @@ const Skills = () => {
   }, []);
 
   return (
+            <BackgroundBeamsWithCollision       className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden">
+
     <section
       id="skills"
       ref={sectionRef}
-      className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
@@ -673,6 +677,7 @@ const Skills = () => {
         </div>
       </div>
     </section>
+        </BackgroundBeamsWithCollision>
   );
 };
 
@@ -741,9 +746,10 @@ const Projects = () => {
   ];
 
   return (
+                <BackgroundBeamsWithCollision       className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden">
+
     <section
       id="projects"
-      className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
     >
       <style>{`
         @keyframes imageShine {
@@ -960,6 +966,7 @@ const Projects = () => {
         </div>
       </div>
     </section>
+        </BackgroundBeamsWithCollision>
   );
 };
 
@@ -1018,10 +1025,11 @@ export const Contact = () => {
   };
 
   return (
+                <BackgroundBeamsWithCollision       className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden">
+
     <section
       id="contact"
       ref={sectionRef}
-      className="min-h-screen bg-gradient-to-r from-black to-green-950 py-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden"
     >
       <style>{`
         @keyframes inputFocus {
@@ -1076,7 +1084,6 @@ export const Contact = () => {
             </p>
           </div>
 
-          {/* Right Side - Form */}
           <div
             className={`transition-all duration-1000 ease-out ${
               isVisible
@@ -1086,7 +1093,6 @@ export const Contact = () => {
           >
             <div className="bg-white rounded-3xl p-5 sm:p-10 lg:p-4 shadow-3xl border-l-8 border-emerald-500 hover:shadow-3xl transition-all duration-300">
               <form ref={form} onSubmit={sendEmail} className="space-y-8">
-                {/* Name Input */}
                 <div
                   className={`transition-all duration-700 ease-out ${
                     isVisible
@@ -1190,6 +1196,7 @@ export const Contact = () => {
         </div>
       </div>
     </section>
+        </BackgroundBeamsWithCollision>
   );
 };
 
