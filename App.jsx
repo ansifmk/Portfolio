@@ -18,12 +18,26 @@ const BackgroundBeamsWithCollision = ({ children, className }) => {
 
   const beams = [
     { initialX: 10, translateX: 10, duration: 7, repeatDelay: 3, delay: 2 },
-    { initialX: 600, translateX: 600, duration: 3, repeatDelay: 3, delay: 4 },
-    { initialX: 100, translateX: 100, duration: 7, repeatDelay: 7, className: "h-6" },
-    { initialX: 400, translateX: 400, duration: 5, repeatDelay: 14, delay: 4 },
-    { initialX: 800, translateX: 800, duration: 11, repeatDelay: 2, className: "h-20" },
-    { initialX: 1000, translateX: 1000, duration: 4, repeatDelay: 2, className: "h-12" },
-    { initialX: 1200, translateX: 1200, duration: 6, repeatDelay: 4, delay: 2, className: "h-6" },
+    { initialX: 40, translateX: 40, duration: 3, repeatDelay: 3, delay: 4 },
+    { initialX: 70, translateX: 70, duration: 7, repeatDelay: 7, className: "h-6" },
+    { initialX: 90, translateX: 90, duration: 5, repeatDelay: 14, delay: 4 },
+    { initialX: 110, translateX: 110, duration: 11, repeatDelay: 2, className: "h-20" },
+    { initialX: 150, translateX: 150, duration: 4, repeatDelay: 2, className: "h-12" },
+    { initialX: 190, translateX: 190, duration: 4, repeatDelay: 4, delay: 2, className: "h-6" },
+    { initialX: 250, translateX: 250, duration: 9, repeatDelay: 5, delay: 3, className: "h-6" },
+    { initialX: 300, translateX: 300, duration: 2, repeatDelay: 8, delay: 4, className: "h-6" },
+    { initialX: 350, translateX: 350, duration: 2, repeatDelay: 8, delay: 4, className: "h-6" },
+    { initialX: 400, translateX: 400, duration: 7, repeatDelay: 7, delay: 2, className: "h-6" },
+    { initialX: 500, translateX: 500, duration: 8, repeatDelay: 6, delay: 4, className: "h-12" },
+    { initialX: 600, translateX: 600, duration: 3, repeatDelay: 5, delay: 9, className: "h-6" },
+    { initialX: 700, translateX: 700, duration: 8, repeatDelay: 9, delay: 3, className: "h-13" },
+    { initialX: 800, translateX: 800, duration: 7, repeatDelay: 4, delay: 5, className: "h-6" },
+    { initialX: 900, translateX: 900, duration: 9, repeatDelay: 12, delay: 7, className: "h-6" },
+    { initialX: 1000, translateX: 1000, duration: 7, repeatDelay: 4, delay: 2, className: "h-20" },
+    { initialX: 1200, translateX: 1200, duration: 4, repeatDelay: 2, delay: 4, className: "h-5" },
+    { initialX: 1300, translateX: 1300, duration: 6, repeatDelay: 9, delay: 6, className: "h-6" },
+    { initialX: 1400, translateX: 1400, duration: 7, repeatDelay: 3, delay: 5, className: "h-8" },
+    { initialX: 1500, translateX: 1500, duration: 3, repeatDelay: 7, delay: 7, className: "h-25" },
   ];
 
   return (
