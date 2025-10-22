@@ -746,10 +746,11 @@ const Projects = () => {
   ];
 
   return (
-                <BackgroundBeamsWithCollision       className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden">
 
     <section
       id="projects"
+                   className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
+
     >
       <style>{`
         @keyframes imageShine {
@@ -966,7 +967,6 @@ const Projects = () => {
         </div>
       </div>
     </section>
-        </BackgroundBeamsWithCollision>
   );
 };
 
