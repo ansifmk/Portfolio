@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Profiler } from "react";
 import {
   AnimatePresence,
   motion,
@@ -6,43 +6,124 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Home, User, Code, Briefcase, Mail, Menu } from "lucide-react";
+import { Home, User, Code, Briefcase, Mail, Menu, ArrowRight, Import } from "lucide-react";
+import emailjs from "@emailjs/browser";
+import { Toaster, toast } from "react-hot-toast";
+
+const cn = (...inputs) => inputs.filter(Boolean).join(' ');
+
+const BackgroundBeamsWithCollision = ({ children, className }) => {
+  const containerRef = useRef(null);
+  const parentRef = useRef(null);
+
+  const beams = [
+    { initialX: 10, translateX: 10, duration: 7, repeatDelay: 3, delay: 2 },
+    { initialX: 600, translateX: 600, duration: 3, repeatDelay: 3, delay: 4 },
+    { initialX: 100, translateX: 100, duration: 7, repeatDelay: 7, className: "h-6" },
+    { initialX: 400, translateX: 400, duration: 5, repeatDelay: 14, delay: 4 },
+    { initialX: 800, translateX: 800, duration: 11, repeatDelay: 2, className: "h-20" },
+    { initialX: 1000, translateX: 1000, duration: 4, repeatDelay: 2, className: "h-12" },
+    { initialX: 1200, translateX: 1200, duration: 6, repeatDelay: 4, delay: 2, className: "h-6" },
+  ];
+
+  return (
+    <div ref={parentRef} className={cn("relative flex items-center w-full justify-center overflow-hidden", className)}>
+      {beams.map((beam) => (
+        <CollisionMechanism key={beam.initialX + "beam-idx"} beamOptions={beam} containerRef={containerRef} parentRef={parentRef} />
+      ))}
+      {children}
+      <div ref={containerRef} className="absolute bottom-0 w-full inset-x-0 pointer-events-none" style={{ boxShadow: "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset" }}></div>
+    </div>
+  );
+};
+
+const CollisionMechanism = React.forwardRef(({ parentRef, containerRef, beamOptions = {} }, ref) => {
+  const beamRef = useRef(null);
+  const [collision, setCollision] = useState({ detected: false, coordinates: null });
+  const [beamKey, setBeamKey] = useState(0);
+  const [cycleCollisionDetected, setCycleCollisionDetected] = useState(false);
+
+  useEffect(() => {
+    const checkCollision = () => {
+      if (beamRef.current && containerRef.current && parentRef.current && !cycleCollisionDetected) {
+        const beamRect = beamRef.current.getBoundingClientRect();
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const parentRect = parentRef.current.getBoundingClientRect();
+
+        if (beamRect.bottom >= containerRect.top) {
+          const relativeX = beamRect.left - parentRect.left + beamRect.width / 2;
+          const relativeY = beamRect.bottom - parentRect.top;
+          setCollision({ detected: true, coordinates: { x: relativeX, y: relativeY } });
+          setCycleCollisionDetected(true);
+        }
+      }
+    };
+
+    const animationInterval = setInterval(checkCollision, 50);
+    return () => clearInterval(animationInterval);
+  }, [cycleCollisionDetected, containerRef]);
+
+  useEffect(() => {
+    if (collision.detected && collision.coordinates) {
+      setTimeout(() => {
+        setCollision({ detected: false, coordinates: null });
+        setCycleCollisionDetected(false);
+      }, 2000);
+      setTimeout(() => setBeamKey((prevKey) => prevKey + 1), 2000);
+    }
+  }, [collision]);
+
+  return (
+    <>
+      <motion.div
+        key={beamKey}
+        ref={beamRef}
+        animate="animate"
+        initial={{ translateY: beamOptions.initialY || "-200px", translateX: beamOptions.initialX || "0px", rotate: beamOptions.rotate || 0 }}
+        variants={{ animate: { translateY: beamOptions.translateY || "1800px", translateX: beamOptions.translateX || "0px", rotate: beamOptions.rotate || 0 } }}
+        transition={{ duration: beamOptions.duration || 8, repeat: Infinity, repeatType: "loop", ease: "linear", delay: beamOptions.delay || 0, repeatDelay: beamOptions.repeatDelay || 0 }}
+        className={cn("absolute left-0 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-green-500 via-cyan-500 to-transparent", beamOptions.className)}
+      />
+      <AnimatePresence>
+        {collision.detected && collision.coordinates && (
+          <Explosion key={`${collision.coordinates.x}-${collision.coordinates.y}`} style={{ left: `${collision.coordinates.x}px`, top: `${collision.coordinates.y}px`, transform: "translate(-50%, -50%)" }} />
+        )}
+      </AnimatePresence>
+    </>
+  );
+});
+
+CollisionMechanism.displayName = "CollisionMechanism";
+
+const Explosion = ({ ...props }) => {
+  const spans = Array.from({ length: 20 }, (_, index) => ({
+    id: index, initialX: 0, initialY: 0,
+    directionX: Math.floor(Math.random() * 80 - 40),
+    directionY: Math.floor(Math.random() * -50 - 10),
+  }));
+
+  return (
+    <div {...props} className={cn("absolute z-50 h-2 w-2", props.className)}>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.5, ease: "easeOut" }} className="absolute -inset-x-10 top-0 m-auto h-2 w-10 rounded-full bg-gradient-to-r from-transparent via-green-500 to-transparent blur-sm"></motion.div>
+      {spans.map((span) => (
+        <motion.span key={span.id} initial={{ x: span.initialX, y: span.initialY, opacity: 1 }} animate={{ x: span.directionX, y: span.directionY, opacity: 0 }} transition={{ duration: Math.random() * 1.5 + 0.5, ease: "easeOut" }} className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-green-500 to-cyan-500" />
+      ))}
+    </div>
+  );
+};
 
 const Navbar = () => {
   const navItems = [
-    {
-      title: "Home",
-      icon: <Home className="h-full w-full text-white" />,
-      href: "#home",
-    },
-    {
-      title: "About",
-      icon: <User className="h-full w-full text-white" />,
-      href: "#about",
-    },
-    {
-      title: "Skills",
-      icon: <Code className="h-full w-full text-white" />,
-      href: "#skills",
-    },
-    {
-      title: "Projects",
-      icon: <Briefcase className="h-full w-full text-white" />,
-      href: "#projects",
-    },
-    {
-      title: "Contact",
-      icon: <Mail className="h-full w-full text-white" />,
-      href: "#contact",
-    },
+    { title: "Home", icon: <Home className="h-full w-full text-white" />, href: "#home" },
+    { title: "About", icon: <User className="h-full w-full text-white" />, href: "#about" },
+    { title: "Skills", icon: <Code className="h-full w-full text-white" />, href: "#skills" },
+    { title: "Projects", icon: <Briefcase className="h-full w-full text-white" />, href: "#projects" },
+    { title: "Contact", icon: <Mail className="h-full w-full text-white" />, href: "#contact" },
   ];
 
   return (
     <>
-      {/* Desktop Floating Dock */}
       <FloatingDockDesktop items={navItems} />
-
-      {/* Mobile Floating Dock */}
       <FloatingDockMobile items={navItems} />
     </>
   );
@@ -54,45 +135,17 @@ const FloatingDockMobile = ({ items }) => {
   return (
     <div className="fixed top-4 right-4 z-50 block md:hidden">
       <div className="relative">
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-green-900 hover:bg-green-100 shadow-lg transition-colors"
-        >
+        <button onClick={() => setOpen(!open)} className="flex h-12 w-12 items-center justify-center rounded-full bg-green-900 hover:bg-green-100 shadow-lg transition-colors">
           <Menu className="h-6 w-6 text-white" />
         </button>
-
         <AnimatePresence>
           {open && (
-            <motion.div
-              layoutId="nav"
-              className="absolute top-full right-0 mt-2 flex flex-col gap-2"
-            >
+            <motion.div layoutId="nav" className="absolute top-full right-0 mt-2 flex flex-col gap-2">
               {items.map((item, idx) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: -10,
-                    transition: {
-                      delay: idx * 0.05,
-                    },
-                  }}
-                  transition={{ delay: (items.length - 1 - idx) * 0.05 }}
-                >
-                  <a
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-full bg-green-600 hover:bg-green-700 shadow-lg transition-colors pl-4 pr-5 py-2.5"
-                  >
+                <motion.div key={item.title} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10, transition: { delay: idx * 0.05 } }} transition={{ delay: (items.length - 1 - idx) * 0.05 }}>
+                  <a href={item.href} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-full bg-green-600 hover:bg-green-700 shadow-lg transition-colors pl-4 pr-5 py-2.5">
                     <div className="h-5 w-5 flex-shrink-0">{item.icon}</div>
-                    <span className="text-sm font-medium text-white whitespace-nowrap">
-                      {item.title}
-                    </span>
+                    <span className="text-sm font-medium text-white whitespace-nowrap">{item.title}</span>
                   </a>
                 </motion.div>
               ))}
@@ -108,11 +161,7 @@ const FloatingDockDesktop = ({ items }) => {
   let mouseX = useMotionValue(Infinity);
 
   return (
-    <motion.div
-      onMouseMove={(e) => mouseX.set(e.pageX)}
-      onMouseLeave={() => mouseX.set(Infinity)}
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden md:flex h-16 items-end gap-4 rounded-2xl  backdrop-blur-sm px-4 pb-3 shadow-xl "
-    >
+    <motion.div onMouseMove={(e) => mouseX.set(e.pageX)} onMouseLeave={() => mouseX.set(Infinity)} className="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden md:flex h-16 items-end gap-4 rounded-2xl backdrop-blur-sm px-4 pb-3 shadow-xl">
       {items.map((item) => (
         <IconContainer mouseX={mouseX} key={item.title} {...item} />
       ))}
@@ -122,7 +171,6 @@ const FloatingDockDesktop = ({ items }) => {
 
 function IconContainer({ mouseX, title, icon, href }) {
   const ref = useRef(null);
-
   let distance = useTransform(mouseX, (val) => {
     let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
@@ -130,71 +178,33 @@ function IconContainer({ mouseX, title, icon, href }) {
 
   let widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
   let heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
-
   let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
-  let heightTransformIcon = useTransform(
-    distance,
-    [-150, 0, 150],
-    [20, 40, 20]
-  );
+  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
 
-  let width = useSpring(widthTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
-  let height = useSpring(heightTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
-
-  let widthIcon = useSpring(widthTransformIcon, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
-  let heightIcon = useSpring(heightTransformIcon, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
+  let width = useSpring(widthTransform, { mass: 0.1, stiffness: 150, damping: 12 });
+  let height = useSpring(heightTransform, { mass: 0.1, stiffness: 150, damping: 12 });
+  let widthIcon = useSpring(widthTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 });
+  let heightIcon = useSpring(heightTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 });
 
   const [hovered, setHovered] = useState(false);
 
   return (
     <a href={href}>
-      <motion.div
-        ref={ref}
-        style={{ width, height }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-green-900 hover:bg-cyan-900 transition-colors"
-      >
+      <motion.div ref={ref} style={{ width, height }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} className="relative flex aspect-square items-center justify-center rounded-full bg-green-900 hover:bg-cyan-900 transition-colors">
         <AnimatePresence>
           {hovered && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, x: "-50%" }}
-              animate={{ opacity: 1, y: 0, x: "-50%" }}
-              exit={{ opacity: 0, y: 2, x: "-50%" }}
-              className="absolute -top-8 left-1/2 w-fit rounded-md border border-gray-700 bg-gray-800 px-2 py-0.5 text-xs whitespace-pre text-white shadow-lg"
-            >
+            <motion.div initial={{ opacity: 0, y: 10, x: "-50%" }} animate={{ opacity: 1, y: 0, x: "-50%" }} exit={{ opacity: 0, y: 2, x: "-50%" }} className="absolute -top-8 left-1/2 w-fit rounded-md border border-gray-700 bg-gray-800 px-2 py-0.5 text-xs whitespace-pre text-white shadow-lg">
               {title}
             </motion.div>
           )}
         </AnimatePresence>
-        <motion.div
-          style={{ width: widthIcon, height: heightIcon }}
-          className="flex items-center justify-center"
-        >
+        <motion.div style={{ width: widthIcon, height: heightIcon }} className="flex items-center justify-center">
           {icon}
         </motion.div>
       </motion.div>
     </a>
   );
 }
-
-// import { useState, useEffect } from 'react';
 import Profile from "./assets/profile.jpg";
 
 const Hero = () => {
@@ -205,130 +215,59 @@ const Hero = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          } else {
-            setIsVisible(false);
-          }
+          setIsVisible(entry.isIntersecting);
         });
       },
-      {
-        threshold: 0.2,
-        rootMargin: "0px",
-      }
+      { threshold: 0.2, rootMargin: "0px" }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
     };
   }, []);
 
   return (
-    <section
-      id="home"
-      ref={sectionRef}
-      className="bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24"
-    >
-      <div className="flex flex-col md:flex-row justify-center items-center max-w-5xl mx-auto gap-8 md:gap-16 w-full">
-        {/* Image Section */}
-        <div className="flex-shrink-0">
-          <div className="relative group">
-            {/* Animated glow background */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-cyan-500 rounded-full opacity-30 blur-lg group-hover:opacity-50 transition-opacity duration-500 animate-pulse"></div>
-
-            {/* Image container */}
-            <img
-              src={Profile}
-              alt="Ansif"
-              className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover shadow-2xl hover:shadow-green-500/50 hover:shadow-3xl transition-all duration-500 group-hover:scale-105"
-            />
-          </div>
+    <BackgroundBeamsWithCollision className="bg-gradient-to-r from-black to-green-950 min-h-screen">
+      <section id="home" ref={sectionRef} className="min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden w-full">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-72 h-72 md:w-[28rem] md:h-[28rem] bg-cyan-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 md:w-[32rem] md:h-[32rem] bg-green-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
         </div>
 
-        {/* Text Section */}
-        <div className="text-center md:text-left flex-1">
-          {/* Main heading */}
-          <div
-            className={`transform transition-all duration-1000 ease-out ${
-              isVisible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
-          >
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-gray-200">
-              Hi, I'm{" "}
-              <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
-                Ansif
-              </span>
-            </h1>
-
-            <p className="text-xl md:text-2xl lg:text-3xl text-gray-300 mb-6 font-light">
-              Frontend Developer | React Enthusiast
-            </p>
-
-            <p className="text-base md:text-lg text-gray-300 mb-8 max-w-2xl leading-relaxed">
-              I create elegant and efficient web solutions with a focus on user
-              experience and clean code. Passionate about building responsive,
-              modern web applications with the latest technologies.
-            </p>
+        <div className="relative z-10 flex flex-col md:flex-row justify-center items-center max-w-5xl mx-auto gap-8 md:gap-16 w-full">
+          <div className="flex-shrink-0">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-cyan-500 rounded-full opacity-30 blur-lg group-hover:opacity-50 transition-opacity duration-500 animate-pulse"></div>
+              <img src={Profile} alt="Ansif" className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover shadow-2xl hover:shadow-green-500/50 hover:shadow-3xl transition-all duration-500 group-hover:scale-105" />
+            </div>
           </div>
 
+          <div className="text-center md:text-left flex-1">
+            <div className={`transform transition-all duration-1000 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`} style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-gray-200">
+                Hi, I'm <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">Ansif</span>
+              </h1>
+              <p className="text-xl md:text-2xl lg:text-3xl text-gray-300 mb-6 font-light">Frontend Developer | React Enthusiast</p>
+              <p className="text-base md:text-lg text-gray-300 mb-8 max-w-2xl leading-relaxed">I create elegant and efficient web solutions with a focus on user experience and clean code. Passionate about building responsive, modern web applications with the latest technologies.</p>
+            </div>
 
-          <div
-            className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-1000 ease-out ${
-              isVisible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{
-              transitionDelay: isVisible ? "500ms" : "0ms",
-              pointerEvents: isVisible ? "auto" : "none",
-            }}
-          >
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-            </a>
-
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 flex items-center justify-center rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-            </a>
-
-            {/* Twitter */}
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-              </svg>
-            </a>
+            <div className={`relative z-10 flex gap-4 mt-8 justify-center md:justify-start transform transition-all duration-1000 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`} style={{ transitionDelay: isVisible ? "500ms" : "0ms", pointerEvents: isVisible ? "auto" : "none" }}>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/30">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" /></svg>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </BackgroundBeamsWithCollision>
   );
 };
 
@@ -723,7 +662,6 @@ const Skills = () => {
   );
 };
 
-import { ArrowRight } from "lucide-react";
 const Projects = () => {
   const [isVisible, setIsVisible] = useState({});
   const [hoveredId, setHoveredId] = useState(null);
@@ -1011,8 +949,6 @@ const Projects = () => {
   );
 };
 
-import emailjs from "@emailjs/browser";
-import { Toaster, toast } from "react-hot-toast";
 
 export const Contact = () => {
   const form = useRef(null);
