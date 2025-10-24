@@ -1058,7 +1058,7 @@ const Projects = () => {
       title: "E-Commerce Platform Apple Cart",
       description:
         "Full-stack shopping experience with secure payments and order tracking.",
-      image: "\goibibo.jpg",
+      image: "\apple.png",
       link: "https://applecartecom.vercel.app",
       tech: "React • Tailwind • Firebase",
     },
@@ -1076,7 +1076,7 @@ const Projects = () => {
       title: "Portfolio Website",
       description:
         "This responsive portfolio site showcases my skills, projects, and contact info. Built with modern technologies and best practices.",
-      image: "Screenshot 2025-10-16 124527.png",
+      image: "\Screenshot 2025-10-24 163530.png",
       link: "https://github.com/yourusername/project3",
       tech: "React • Tailwind • Framer Motion",
     },
