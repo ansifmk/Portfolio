@@ -1507,9 +1507,195 @@ export const Contact = () => {
   );
 };
 
+const SnakeCursor = () => {
+  const [trail, setTrail] = useState(Array(20).fill({ x: -100, y: -100 }));
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    let mouseX = -100;
+    let mouseY = -100;
+
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      // Create sparkle particles randomly
+      if (Math.random() > 0.7) {
+        const newParticle = {
+          id: Date.now() + Math.random(),
+          x: mouseX + (Math.random() - 0.5) * 30,
+          y: mouseY + (Math.random() - 0.5) * 30,
+          size: Math.random() * 6 + 3,
+          duration: Math.random() * 800 + 600,
+        };
+        
+        setParticles(prev => [...prev, newParticle]);
+        
+        setTimeout(() => {
+          setParticles(prev => prev.filter(p => p.id !== newParticle.id));
+        }, newParticle.duration);
+      }
+    };
+
+    const animateTrail = () => {
+      setTrail((prevTrail) => {
+        const newTrail = [...prevTrail];
+        newTrail[0] = { x: mouseX, y: mouseY };
+        
+        for (let i = 1; i < newTrail.length; i++) {
+          const prev = newTrail[i - 1];
+          const current = newTrail[i];
+          
+          const dx = prev.x - current.x;
+          const dy = prev.y - current.y;
+          
+          newTrail[i] = {
+            x: current.x + dx * 0.2,
+            y: current.y + dy * 0.2,
+          };
+        }
+        
+        return newTrail;
+      });
+      
+      requestAnimationFrame(animateTrail);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    const animation = requestAnimationFrame(animateTrail);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(animation);
+    };
+  }, []);
+
+  return (
+    <>
+      <style>{`
+        * {
+          cursor: none !important;
+        }
+        @keyframes sparkle {
+          0% {
+            transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+            opacity: 0;
+          }
+        }
+        @keyframes pulse {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.2);
+          }
+        }
+      `}</style>
+      
+      {/* Main snake trail with vibrant colors */}
+      {trail.map((pos, index) => {
+        const size = 15  - (index * 0.7);
+        const opacity = 1 - (index * 0.045);
+        
+        // Rainbow gradient colors
+        const colors = [
+          { from: '#ffffffff', to: '#98ffa4ff' },
+          { from: '#5eff2cff', to: '#1f9b18ff' },
+          { from: '#016115ff', to: '#1fa9aeff' },
+          { from: '#61cff0ff', to: '#00df94ff' },
+          { from: '#7c89ffff', to: '#06b6d4' },
+        ];
+        
+        const colorIndex = Math.floor((index / trail.length) * colors.length);
+        const color = colors[colorIndex] || colors[0];
+        
+        return (
+          <div
+            key={index}
+            className="fixed pointer-events-none z-[9999] rounded-full"
+            style={{
+              left: `${pos.x}px`,
+              top: `${pos.y}px`,
+              width: `${size}px`,
+              height: `${size}px`,
+              background: `radial-gradient(circle, ${color.from} 0%, ${color.to} 100%)`,
+              opacity: opacity,
+              transform: 'translate(-50%, -50%)',
+              boxShadow: `
+                0 0 ${size * 2}px ${color.from},
+                0 0 ${size * 3}px ${color.to},
+                inset 0 0 ${size}px rgba(255,255,255,0.3)
+              `,
+            }}
+          />
+        );
+      })}
+      
+      <div
+        className="fixed pointer-events-none z-[10000] rounded-full"
+        style={{
+          left: `${trail[0].x}px`,
+          top: `${trail[0].y}px`,
+          width: '24px',
+          height: '24px',
+          background: 'radial-gradient(circle, #ffffff 0%, #06b6d4 50%, #8b5cf6 100%)',
+          transform: 'translate(-50%, -50%)',
+          boxShadow: `
+            0 0 20px #c9ffc3ff,
+            0 0 40px #77ff8cff,
+            0 0 60px #47c530ff,
+            inset 0 0 15px rgba(16, 80, 12, 0.8)
+          `,
+          animation: 'pulse 1s ease-in-out infinite',
+        }}
+      />
+      
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className="fixed pointer-events-none z-[9998]"
+          style={{
+            left: `${particle.x}px`,
+            top: `${particle.y}px`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            animation: `sparkle ${particle.duration}ms ease-out forwards`,
+          }}
+        >
+          <div
+            className="w-full h-full rounded-full"
+            style={{
+              background: 'radial-gradient(circle, #ffffff 0%, #06b6d4 40%, transparent 70%)',
+              boxShadow: '0 0 10px #06b6d4, 0 0 20px #8b5cf6',
+            }}
+          />
+        </div>
+      ))}
+      
+      {/* Large ambient glow */}
+      <div
+        className="fixed pointer-events-none z-[9997] rounded-full blur-3xl"
+        style={{
+          left: `${trail[0].x}px`,
+          top: `${trail[0].y}px`,
+          width: '150px',
+          height: '150px',
+          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(236, 72, 153, 0.2) 100%)',
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
+    </>
+  );
+};
+
 export default function App() {
   return (
     <>
+      <SnakeCursor />
       <Navbar />
       <Hero />
       <About />
