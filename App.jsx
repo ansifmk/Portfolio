@@ -1519,7 +1519,6 @@ const SnakeCursor = () => {
       mouseX = e.clientX;
       mouseY = e.clientY;
       
-      // Create sparkle particles randomly
       if (Math.random() > 0.7) {
         const newParticle = {
           id: Date.now() + Math.random(),
