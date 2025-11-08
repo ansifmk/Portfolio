@@ -1508,32 +1508,44 @@ export const Contact = () => {
 };
 
 const SnakeCursor = () => {
-  const [trail, setTrail] = useState(Array(20).fill({ x: -100, y: -100 }));
-  const [particles, setParticles] = useState([]);
+  const [trail, setTrail] = useState(Array(25).fill({ x: -100, y: -100 }));
+  const [clicks, setClicks] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const checkMobile = () => {
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+      setIsMobile(mobile);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
     let mouseX = -100;
     let mouseY = -100;
 
     const handleMouseMove = (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+    };
+
+    const handleClick = (e) => {
+      const newClick = {
+        id: Date.now(),
+        x: e.clientX,
+        y: e.clientY,
+      };
       
-      if (Math.random() > 0.7) {
-        const newParticle = {
-          id: Date.now() + Math.random(),
-          x: mouseX + (Math.random() - 0.5) * 30,
-          y: mouseY + (Math.random() - 0.5) * 30,
-          size: Math.random() * 6 + 3,
-          duration: Math.random() * 800 + 600,
-        };
-        
-        setParticles(prev => [...prev, newParticle]);
-        
-        setTimeout(() => {
-          setParticles(prev => prev.filter(p => p.id !== newParticle.id));
-        }, newParticle.duration);
-      }
+      setClicks(prev => [...prev, newClick]);
+      
+      setTimeout(() => {
+        setClicks(prev => prev.filter(c => c.id !== newClick.id));
+      }, 800);
     };
 
     const animateTrail = () => {
@@ -1549,8 +1561,8 @@ const SnakeCursor = () => {
           const dy = prev.y - current.y;
           
           newTrail[i] = {
-            x: current.x + dx * 0.2,
-            y: current.y + dy * 0.2,
+            x: current.x + dx * 0.3,
+            y: current.y + dy * 0.3,
           };
         }
         
@@ -1561,13 +1573,19 @@ const SnakeCursor = () => {
     };
 
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("click", handleClick);
     const animation = requestAnimationFrame(animateTrail);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("click", handleClick);
       cancelAnimationFrame(animation);
     };
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <>
@@ -1575,59 +1593,37 @@ const SnakeCursor = () => {
         * {
           cursor: none !important;
         }
-        @keyframes sparkle {
+        @keyframes clickWave {
           0% {
-            transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            transform: translate(-50%, -50%) scale(0);
             opacity: 1;
           }
           100% {
-            transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+            transform: translate(-50%, -50%) scale(3);
             opacity: 0;
-          }
-        }
-        @keyframes pulse {
-          0%, 100% {
-            transform: translate(-50%, -50%) scale(1);
-          }
-          50% {
-            transform: translate(-50%, -50%) scale(1.2);
           }
         }
       `}</style>
       
-      {/* Main snake trail with vibrant colors */}
       {trail.map((pos, index) => {
-        const size = 15  - (index * 0.7);
-        const opacity = 1 - (index * 0.045);
-        
-        // Rainbow gradient colors
-        const colors = [
-          { from: '#ffffffff', to: '#98ffa4ff' },
-          { from: '#5eff2cff', to: '#1f9b18ff' },
-          { from: '#016115ff', to: '#1fa9aeff' },
-          { from: '#61cff0ff', to: '#00df94ff' },
-          { from: '#7c89ffff', to: '#06b6d4' },
-        ];
-        
-        const colorIndex = Math.floor((index / trail.length) * colors.length);
-        const color = colors[colorIndex] || colors[0];
+        const size = 18 - (index * 0.5);
+        const opacity = 1 - (index * 0.038);
         
         return (
           <div
             key={index}
-            className="fixed pointer-events-none z-[9999] rounded-full"
+            className="fixed pointer-events-none z-[999] rounded-full"
             style={{
               left: `${pos.x}px`,
               top: `${pos.y}px`,
               width: `${size}px`,
               height: `${size}px`,
-              background: `radial-gradient(circle, ${color.from} 0%, ${color.to} 100%)`,
+              background: `linear-gradient(135deg, #165606ff 0%, #18e496ff 100%)`,
               opacity: opacity,
               transform: 'translate(-50%, -50%)',
               boxShadow: `
-                0 0 ${size * 2}px ${color.from},
-                0 0 ${size * 3}px ${color.to},
-                inset 0 0 ${size}px rgba(255,255,255,0.3)
+                0 0 ${size}px rgba(0, 255, 135, ${opacity * 0.1}),
+                0 0 ${size * 1}px rgba(96, 239, 255, ${opacity * 0.1})
               `,
             }}
           />
@@ -1635,61 +1631,64 @@ const SnakeCursor = () => {
       })}
       
       <div
-        className="fixed pointer-events-none z-[10000] rounded-full"
+        className="fixed pointer-events-none z-[1000] rounded-full"
         style={{
           left: `${trail[0].x}px`,
           top: `${trail[0].y}px`,
-          width: '24px',
-          height: '24px',
-          background: 'radial-gradient(circle, #ffffff 0%, #06b6d4 50%, #8b5cf6 100%)',
+          width: '5px',
+          height: '5px',
+          background: 'linear-gradient(135deg, #165804ff 0%, #00ff87 100%)',
           transform: 'translate(-50%, -50%)',
           boxShadow: `
-            0 0 20px #c9ffc3ff,
-            0 0 40px #77ff8cff,
-            0 0 60px #47c530ff,
-            inset 0 0 15px rgba(16, 80, 12, 0.8)
+            0 0 20px rgba(18, 104, 64, 1),
+            0 0 40px rgba(9, 87, 16, 0.8),
+            inset 0 0 8px rgba(7, 66, 12, 1)
           `,
-          animation: 'pulse 1s ease-in-out infinite',
         }}
       />
       
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="fixed pointer-events-none z-[9998]"
-          style={{
-            left: `${particle.x}px`,
-            top: `${particle.y}px`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            animation: `sparkle ${particle.duration}ms ease-out forwards`,
-          }}
-        >
-          <div
-            className="w-full h-full rounded-full"
-            style={{
-              background: 'radial-gradient(circle, #ffffff 0%, #06b6d4 40%, transparent 70%)',
-              boxShadow: '0 0 10px #06b6d4, 0 0 20px #8b5cf6',
-            }}
-          />
-        </div>
-      ))}
-      
-      {/* Large ambient glow */}
       <div
-        className="fixed pointer-events-none z-[9997] rounded-full blur-3xl"
+        className="fixed pointer-events-none z-[9999] rounded-full border-2"
         style={{
           left: `${trail[0].x}px`,
           top: `${trail[0].y}px`,
-          width: '150px',
-          height: '150px',
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(236, 72, 153, 0.2) 100%)',
+          width: '5px',
+          height: '5px',
+          borderColor: 'rgba(0, 255, 135, 0.5)',
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
+      
+      {clicks.map((click) => (
+        <div
+          key={click.id}
+          className="fixed pointer-events-none z-[9998] rounded-full border-2"
+          style={{
+            left: `${click.x}px`,
+            top: `${click.y}px`,
+            width: '4px',
+            height: '4px',
+            borderColor: '#00ff87',
+            animation: 'clickWave 0.8s ease-out forwards',
+          }}
+        />
+      ))}
+      
+      <div
+        className="fixed pointer-events-none z-[9997] rounded-full blur-2xl"
+        style={{
+          left: `${trail[0].x}px`,
+          top: `${trail[0].y}px`,
+          width: '100px',
+          height: '100px',
+          background: 'radial-gradient(circle, rgba(0, 255, 135, 0.3) 0%, rgba(96, 239, 255, 0.2) 50%, transparent 100%)',
           transform: 'translate(-50%, -50%)',
         }}
       />
     </>
   );
 };
+
 
 export default function App() {
   return (
