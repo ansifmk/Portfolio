@@ -901,123 +901,121 @@ const Skills = () => {
   }, []);
 
   return (
+    <section
+      id="skills"
+      ref={sectionRef}
+      className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden"
+    >
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+      </div>
 
-      <section id="skills" ref={sectionRef}
-      className=" bg-gradient-to-r from-black to-green-950 min-h-screen flex flex-col md:flex-row justify-center items-center p-6 pt-24 relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="relative z-10 max-w-7xl w-full">
+        <div
+          className={`text-center mb-16 transform transition-all duration-1000 ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`}
+        >
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-300 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
+            My Skills
+          </h2>
+
           <div
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: "1s" }}
+            className={`h-1 w-32 bg-gradient-to-r from-green-100 via-green-400 to-green-900 rounded-full mx-auto transform transition-all duration-1000 ${
+              isVisible ? "w-32 opacity-100" : "w-0 opacity-0"
+            }`}
+            style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
           ></div>
+
+          <p className="text-gray-400 mt-6 text-lg md:text-xl">
+            Technologies I work with
+          </p>
         </div>
 
-        <div className="relative z-10 max-w-7xl w-full">
-          <div
-            className={`text-center mb-16 transform transition-all duration-1000 ${
-              isVisible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-10 opacity-0"
-            }`}
-          >
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-cyan-300 via-cyan-700 to-cyan-900 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
-              My Skills
-            </h2>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {skills.map((skill, index) => (
             <div
-              className={`h-1 w-32 bg-gradient-to-r from-green-100 via-green-400 to-green-900 rounded-full mx-auto transform transition-all duration-1000 ${
-                isVisible ? "w-32 opacity-100" : "w-0 opacity-0"
+              key={skill.name}
+              className={`group relative transform transition-all duration-700 ${
+                animatedSkills[skill.name]
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
               }`}
-              style={{ transitionDelay: isVisible ? "200ms" : "0ms" }}
-            ></div>
+              style={{ transitionDelay: `${index * 100}ms` }}
+            >
+              <div className="relative bg-gradient-to-br from-green-500/10 to-green-100/5 backdrop-blur-sm border border-green-500/30 hover:border-green-500/60 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 overflow-hidden group-hover:bg-green-500/5 h-full">
+                <div
+                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${skill.glow} blur-xl`}
+                ></div>
 
-            <p className="text-gray-400 mt-6 text-lg md:text-xl">
-              Technologies I work with
-            </p>
-          </div>
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-4 mx-auto filter drop-shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
+                    <img
+                      src={skill.logo}
+                      alt={`${skill.name} logo`}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {skills.map((skill, index) => (
-              <div
-                key={skill.name}
-                className={`group relative transform transition-all duration-700 ${
-                  animatedSkills[skill.name]
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-10 opacity-0"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className="relative bg-gradient-to-br from-green-500/10 to-green-100/5 backdrop-blur-sm border border-green-500/30 hover:border-green-500/60 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 overflow-hidden group-hover:bg-green-500/5 h-full">
-                  <div
-                    className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${skill.glow} blur-xl`}
-                  ></div>
-
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-4 mx-auto filter drop-shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
-                      <img
-                        src={skill.logo}
-                        alt={`${skill.name} logo`}
-                        className="w-full h-full object-contain"
-                        loading="lazy"
-                      />
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-4 text-center transform transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-cyan-400 flex-1">
+                    {skill.name}
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Proficiency</span>
+                      <span className="text-green-400 font-semibold">
+                        {skill.level}%
+                      </span>
                     </div>
 
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-4 text-center transform transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-cyan-400 flex-1">
-                      {skill.name}
-                    </h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Proficiency</span>
-                        <span className="text-green-400 font-semibold">
-                          {skill.level}%
-                        </span>
-                      </div>
-
-                      <div className="h-2 bg-gray-800 rounded-full overflow-hidden border border-green-500/20">
-                        <div
-                          className={`h-full bg-gradient-to-r ${skill.color} rounded-full relative transform origin-left transition-all duration-1000 ease-out`}
-                          style={{
-                            width: animatedSkills[skill.name]
-                              ? `${skill.level}%`
-                              : "0%",
-                            transitionDelay: `${index * 50}ms`,
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-                        </div>
+                    <div className="h-2 bg-gray-800 rounded-full overflow-hidden border border-green-500/20">
+                      <div
+                        className={`h-full bg-gradient-to-r ${skill.color} rounded-full relative transform origin-left transition-all duration-1000 ease-out`}
+                        style={{
+                          width: animatedSkills[skill.name]
+                            ? `${skill.level}%`
+                            : "0%",
+                          transitionDelay: `${index * 50}ms`,
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
                       </div>
                     </div>
                   </div>
-
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
+
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-            ))}
-          </div>
-          <div
-            className={`text-center mt-16 transform transition-all duration-1000 ${
-              isVisible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-10 opacity-0"
-            }`}
-            style={{ transitionDelay: isVisible ? "500ms" : "0ms" }}
-          >
-            <p className="text-gray-400 text-lg mb-6">
-              Always learning and expanding my toolkit
-            </p>
-            <div className="inline-flex items-center gap-2 text-green-400 font-semibold hover:text-cyan-400 transition-colors duration-300 group cursor-pointer">
-              <span>Explore my projects</span>
-              <span className="transform group-hover:translate-x-1 transition-transform duration-300">
-                →
-              </span>
             </div>
+          ))}
+        </div>
+        <div
+          className={`text-center mt-16 transform transition-all duration-1000 ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`}
+          style={{ transitionDelay: isVisible ? "500ms" : "0ms" }}
+        >
+          <p className="text-gray-400 text-lg mb-6">
+            Always learning and expanding my toolkit
+          </p>
+          <div className="inline-flex items-center gap-2 text-green-400 font-semibold hover:text-cyan-400 transition-colors duration-300 group cursor-pointer">
+            <span>Explore my projects</span>
+            <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
   );
 };
 
-import goibibo from "./assets/goibibo.jpg"
+import goibibo from "./assets/goibibo.jpg";
 const Projects = () => {
   const [isVisible, setIsVisible] = useState({});
   const [hoveredId, setHoveredId] = useState(null);
@@ -1076,7 +1074,7 @@ const Projects = () => {
       title: "Portfolio Website",
       description:
         "This responsive portfolio site showcases my skills, projects, and contact info. Built with modern technologies and best practices.",
-      image: "\Screenshot 2025-10-24 163530.png",
+      image: "Screenshot 2025-10-24 163530.png",
       link: "https://github.com/yourusername/project3",
       tech: "React • Tailwind • Framer Motion",
     },
@@ -1514,14 +1512,17 @@ const SnakeCursor = () => {
 
   useEffect(() => {
     const checkMobile = () => {
-      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+      const mobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        ) || window.innerWidth < 768;
       setIsMobile(mobile);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -1540,11 +1541,11 @@ const SnakeCursor = () => {
         x: e.clientX,
         y: e.clientY,
       };
-      
-      setClicks(prev => [...prev, newClick]);
-      
+
+      setClicks((prev) => [...prev, newClick]);
+
       setTimeout(() => {
-        setClicks(prev => prev.filter(c => c.id !== newClick.id));
+        setClicks((prev) => prev.filter((c) => c.id !== newClick.id));
       }, 800);
     };
 
@@ -1552,23 +1553,23 @@ const SnakeCursor = () => {
       setTrail((prevTrail) => {
         const newTrail = [...prevTrail];
         newTrail[0] = { x: mouseX, y: mouseY };
-        
+
         for (let i = 1; i < newTrail.length; i++) {
           const prev = newTrail[i - 1];
           const current = newTrail[i];
-          
+
           const dx = prev.x - current.x;
           const dy = prev.y - current.y;
-          
+
           newTrail[i] = {
             x: current.x + dx * 0.3,
             y: current.y + dy * 0.3,
           };
         }
-        
+
         return newTrail;
       });
-      
+
       requestAnimationFrame(animateTrail);
     };
 
@@ -1604,11 +1605,11 @@ const SnakeCursor = () => {
           }
         }
       `}</style>
-      
+
       {trail.map((pos, index) => {
-        const size = 18 - (index * 0.5);
-        const opacity = 1 - (index * 0.038);
-        
+        const size = 18 - index * 0.5;
+        const opacity = 1 - index * 0.038;
+
         return (
           <div
             key={index}
@@ -1620,7 +1621,7 @@ const SnakeCursor = () => {
               height: `${size}px`,
               background: `linear-gradient(135deg, #165606ff 0%, #18e496ff 100%)`,
               opacity: opacity,
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
               boxShadow: `
                 0 0 ${size}px rgba(0, 255, 135, ${opacity * 0.1}),
                 0 0 ${size * 1}px rgba(96, 239, 255, ${opacity * 0.1})
@@ -1629,16 +1630,16 @@ const SnakeCursor = () => {
           />
         );
       })}
-      
+
       <div
         className="fixed pointer-events-none z-[1000] rounded-full"
         style={{
           left: `${trail[0].x}px`,
           top: `${trail[0].y}px`,
-          width: '5px',
-          height: '5px',
-          background: 'linear-gradient(135deg, #165804ff 0%, #00ff87 100%)',
-          transform: 'translate(-50%, -50%)',
+          width: "5px",
+          height: "5px",
+          background: "linear-gradient(135deg, #165804ff 0%, #00ff87 100%)",
+          transform: "translate(-50%, -50%)",
           boxShadow: `
             0 0 20px rgba(18, 104, 64, 1),
             0 0 40px rgba(9, 87, 16, 0.8),
@@ -1646,19 +1647,19 @@ const SnakeCursor = () => {
           `,
         }}
       />
-      
+
       <div
         className="fixed pointer-events-none z-[9999] rounded-full border-2"
         style={{
           left: `${trail[0].x}px`,
           top: `${trail[0].y}px`,
-          width: '5px',
-          height: '5px',
-          borderColor: 'rgba(0, 255, 135, 0.5)',
-          transform: 'translate(-50%, -50%)',
+          width: "5px",
+          height: "5px",
+          borderColor: "rgba(0, 255, 135, 0.5)",
+          transform: "translate(-50%, -50%)",
         }}
       />
-      
+
       {clicks.map((click) => (
         <div
           key={click.id}
@@ -1666,29 +1667,29 @@ const SnakeCursor = () => {
           style={{
             left: `${click.x}px`,
             top: `${click.y}px`,
-            width: '4px',
-            height: '4px',
-            borderColor: '#00ff87',
-            animation: 'clickWave 0.8s ease-out forwards',
+            width: "4px",
+            height: "4px",
+            borderColor: "#00ff87",
+            animation: "clickWave 0.8s ease-out forwards",
           }}
         />
       ))}
-      
+
       <div
         className="fixed pointer-events-none z-[9997] rounded-full blur-2xl"
         style={{
           left: `${trail[0].x}px`,
           top: `${trail[0].y}px`,
-          width: '100px',
-          height: '100px',
-          background: 'radial-gradient(circle, rgba(0, 255, 135, 0.3) 0%, rgba(96, 239, 255, 0.2) 50%, transparent 100%)',
-          transform: 'translate(-50%, -50%)',
+          width: "100px",
+          height: "100px",
+          background:
+            "radial-gradient(circle, rgba(0, 255, 135, 0.3) 0%, rgba(96, 239, 255, 0.2) 50%, transparent 100%)",
+          transform: "translate(-50%, -50%)",
         }}
       />
     </>
   );
 };
-
 
 export default function App() {
   return (
