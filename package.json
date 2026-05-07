@@ -18,12 +18,13 @@
     "@tailwindcss/vite": "^4.1.14",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
+    "gsap": "^3.15.0",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
