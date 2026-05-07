@@ -1369,24 +1369,24 @@ const Gallery = () => {
       title: "Topic presentation",
       subtitle: "",
       borderColor: "#3B82F6",
-      gradient: "linear-gradient(180deg, #3B82F6, #000)",
-      url: "https://github.com/yourusername/project2"
+      gradient: "linear-gradient(180deg, #3B82F6, #000)"
+      
     },
     {
       images: [quates, quate],
       title: "Morning Section",
-      subtitle: "Quote of the day",
+      subtitle: "",
       borderColor: "#F59E0B",
       gradient: "linear-gradient(165deg, #F59E0B, #000)",
-      url: "#"
+      
     },
     {
       images: [intro, introduction],
       title: "Self Introduction",
-      subtitle: "Personal Presentation",
+      subtitle: "",
       borderColor: "#3B82F6",
-      gradient: "linear-gradient(165deg, #3B82F6, #000)",
-      url: "#"
+      gradient: "linear-gradient(165deg, #3B82F6, #000)"
+      
     },
   ];
 
