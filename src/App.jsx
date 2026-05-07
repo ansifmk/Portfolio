@@ -1458,15 +1458,7 @@ const Gallery = () => {
                       {item.subtitle && (
                         <p className="text-sm text-gray-400">{item.subtitle}</p>
                       )}
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-3 text-sm text-green-400 hover:text-green-300 transition-colors"
-                      >
-                        View Details
-                        <ArrowRight className="w-3 h-3" />
-                      </a>
+                    
                     </div>
                   </div>
                 </div>
