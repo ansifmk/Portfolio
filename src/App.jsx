@@ -1966,19 +1966,34 @@ const KeyboardHandler = ({ onPrev, onNext, onClose }) => {
 
 const Projects = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
   const sectionRef = useRef(null);
+  const containerRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => setIsVisible(entry.isIntersecting));
       },
-      { threshold: 0.05 }
+      { threshold: 0.1 }
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => {
       if (sectionRef.current) observer.unobserve(sectionRef.current);
     };
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (containerRef.current) {
+        const scrollPercentage = (window.scrollY - containerRef.current.offsetTop) / 500;
+        setScrollProgress(Math.min(1, Math.max(0, scrollPercentage)));
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const projects = [
@@ -1989,14 +2004,9 @@ const Projects = () => {
       description:
         "Full-stack shopping experience with secure payments and real-time order tracking. Built with React and Firebase for lightning-fast data sync.",
       image: apple,
-      link: "https://applecartecom.vercel.app",
+      liveLink: "https://applecartecom.vercel.app",
+      codeLink: "https://github.com/ansifmk/E-Commerce_AppleCart-connection-frontend",
       tech: ["React", "Tailwind", "Firebase"],
-      number: "01",
-      accent: "#3b82f6",
-      accentMuted: "rgba(59,130,246,0.08)",
-      accentBorder: "rgba(59,130,246,0.3)",
-      accentGlow: "rgba(59,130,246,0.25)",
-      bg: "linear-gradient(135deg, #080d1a 0%, #0a1428 60%, #0d1d3a 100%)",
     },
     {
       id: 2,
@@ -2005,14 +2015,9 @@ const Projects = () => {
       description:
         "Mobile-first task management app with intuitive drag-and-drop UI and seamless performance across all devices.",
       image: Zayk,
-      link: "https://zayq.vercel.app/",
+      liveLink: "https://zayq.vercel.app/",
+      codeLink: "https://github.com/BeyteFlow/ZAYQ",
       tech: ["React", "Tailwind", "Firebase"],
-      number: "02",
-      accent: "#22d3ee",
-      accentMuted: "rgba(34,211,238,0.08)",
-      accentBorder: "rgba(34,211,238,0.3)",
-      accentGlow: "rgba(34,211,238,0.25)",
-      bg: "linear-gradient(135deg, #080d1a 0%, #081a1f 60%, #0a2028 100%)",
     },
   ];
 
@@ -2020,10 +2025,10 @@ const Projects = () => {
     <section
       id="projects"
       ref={sectionRef}
-      className="bg-[#080d1a] relative overflow-hidden"
+      className="bg-[#080d1a] min-h-screen py-20 px-4 md:px-6 lg:px-8 relative overflow-hidden"
     >
-      {/* Ambient glow blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Background Effects - Same as Hero */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
         <div
           className="absolute bottom-1/4 right-1/4 w-72 h-72 md:w-[28rem] md:h-[28rem] bg-cyan-500/15 rounded-full blur-3xl animate-pulse"
@@ -2035,96 +2040,311 @@ const Projects = () => {
         />
       </div>
 
-      {/* Heading */}
-      <div className="relative z-10 pt-20 pb-10 px-4 text-center">
-        <div
-          className={`transition-all duration-1000 ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
+      {/* Header Section */}
+      <div className="relative z-10 max-w-7xl mx-auto mb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
         >
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
-            My Projects
+          
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold">
+            <br />
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Projects
+            </span>
           </h2>
-          <p className="text-base md:text-lg text-gray-400 max-w-xl mx-auto mt-4">
+          <div className="flex justify-center gap-2 mt-6">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="w-2 h-2 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: i === activeSlide ? "#06b6d4" : "rgba(255,255,255,0.3)",
+                  width: i === activeSlide ? "24px" : "8px",
+                }}
+              />
+            ))}
+          </div>
+          <p className="text-gray-400 max-w-2xl mx-auto mt-6 text-sm md:text-base">
             A collection of projects that showcase creativity and technical excellence
           </p>
-          <div
-            className={`h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 rounded-full mx-auto mt-4 transition-all duration-1000 ${
-              isVisible ? "w-32 opacity-100" : "w-0 opacity-0"
-            }`}
-            style={{ transitionDelay: "200ms" }}
-          />
-        </div>
+        </motion.div>
       </div>
 
-      {/* Stacked Cards - Reduced height only */}
-      <div className="relative z-10" style={{ height: "110vh" }}>
-        {/* Card 1 - Background card */}
-        <div className="sticky top-20 px-4 md:px-10" style={{ zIndex: 10 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <ProjectCardContent project={projects[0]} index={0} isFirst={true} />
-          </motion.div>
+      {/* Horizontal Scroll Section - Left to Right */}
+      <div className="relative z-10 overflow-hidden">
+        {/* Scroll Indicator */}
+        <div className="flex justify-center items-center gap-2 mb-6">
+          <span className="text-xs text-cyan-400/70 animate-pulse">← Scroll left to right →</span>
+          <svg className="w-4 h-4 text-cyan-400/50 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
         </div>
 
-        {/* Card 2 - Comes OVER Card 1 */}
-        <div 
-          className="sticky top-20 px-4 md:px-10"
-          style={{ zIndex: 20, marginTop: "-120px" }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-          >
-            <ProjectCardContent project={projects[1]} index={1} isFirst={false} />
-          </motion.div>
-        </div>
-      </div>
-
-      {/* CTA - Reduced padding */}
-      {/* <div
-        className={`relative z-10 py-16 px-4 text-center transition-all duration-1000 ${
-          isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-        }`}
-        style={{ transitionDelay: isVisible ? "400ms" : "0ms" }}
-      >
         <div
-          className="inline-block p-6 md:p-8 rounded-3xl border mx-auto"
+          ref={containerRef}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-8 gap-8 cursor-grab active:cursor-grabbing"
           style={{
-            background: "linear-gradient(135deg, rgba(59,130,246,0.08), rgba(34,211,238,0.05))",
-            borderColor: "rgba(59,130,246,0.25)",
-            boxShadow: "0 0 40px rgba(59,130,246,0.08)",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
+          }}
+          onScroll={(e) => {
+            const index = Math.round(e.target.scrollLeft / (window.innerWidth - 100));
+            setActiveSlide(index);
           }}
         >
-          <h3 className="text-xl md:text-3xl font-bold text-white mb-2 md:mb-3">
-            Interested in collaborating?
-          </h3>
-          <p className="text-sm md:text-base text-gray-400 mb-6">
-            Let's create something amazing together
-          </p>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-sm md:text-base text-white transition-all duration-300 hover:gap-4 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)]"
-            style={{
-              background: "linear-gradient(135deg, #3b82f6, #22d3ee)",
-              boxShadow: "0 4px 20px rgba(34,211,238,0.2)",
+          {projects.map((project, idx) => (
+            <motion.div
+              key={project.id}
+              className="flex-none w-[90vw] md:w-[80vw] lg:w-[70vw] snap-center"
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+              onMouseEnter={() => setHoveredCard(project.id)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              <div 
+                className="relative bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 overflow-hidden group transition-all duration-500"
+                style={{
+                  boxShadow: hoveredCard === project.id 
+                    ? "0 20px 40px -15px rgba(6, 182, 212, 0.3), 0 0 0 1px rgba(6, 182, 212, 0.3)" 
+                    : "0 0 0 1px rgba(255,255,255,0.05)",
+                  transform: hoveredCard === project.id ? "translateY(-8px)" : "translateY(0px)",
+                }}
+              >
+                {/* Animated Gradient Border on Hover */}
+                <div 
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: "",
+                    filter: "blur(20px)",
+                    opacity: hoveredCard === project.id ? 0.3 : 0,
+                  }}
+                />
+                
+                {/* Cyan Glow Effect on Hover */}
+                <div 
+                  className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: "radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.4), transparent)",
+                    opacity: hoveredCard === project.id ? 1 : 0,
+                  }}
+                />
+                
+                <div className="relative flex flex-col md:flex-row gap-8 p-6 md:p-10">
+                  {/* Left Side - Image */}
+                  <div className="w-full md:w-1/2">
+                    <div className="relative overflow-hidden rounded-2xl">
+                      <motion.div
+                        className="relative aspect-[4/3] overflow-hidden"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                      </motion.div>
+                      
+                      {/* View Button Overlay - Cyan on Hover */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                        <motion.button
+                          className="w-20 h-20 rounded-full bg-cyan-500/20 backdrop-blur-md flex items-center justify-center border border-cyan-400/50 hover:bg-cyan-500/30 transition-all duration-300"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => window.open(project.liveLink, "_blank")}
+                        >
+                          <svg className="w-8 h-8 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Side - Content */}
+                  <div className="w-full md:w-1/2 flex flex-col justify-center space-y-6">
+                    {/* Project Number */}
+                    <div className="text-8xl font-bold text-white/5 absolute right-6 top-6">
+                      {String(idx + 1).padStart(2, "0")}
+                    </div>
+
+                    {/* Category - Changes color on hover */}
+                    <div>
+                      <span 
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-300"
+                        style={{
+                          backgroundColor: hoveredCard === project.id ? "rgba(6, 182, 212, 0.15)" : "rgba(59, 130, 246, 0.1)",
+                          borderColor: hoveredCard === project.id ? "rgba(6, 182, 212, 0.5)" : "rgba(6, 182, 212, 0.3)",
+                          color: hoveredCard === project.id ? "#22d3ee" : "#06b6d4",
+                          borderWidth: "1px",
+                          borderStyle: "solid",
+                        }}
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                        {project.subtitle}
+                      </span>
+                    </div>
+
+                    {/* Title - Gradient on hover */}
+                    <h3 
+                      className="text-3xl md:text-4xl lg:text-5xl font-bold transition-all duration-300"
+                      style={{
+                        color: hoveredCard === project.id ? "transparent" : "white",
+                        backgroundImage: hoveredCard === project.id 
+                          ? "linear-gradient(135deg, #3b82f6, #06b6d4, #22d3ee)" 
+                          : "none",
+                        backgroundClip: hoveredCard === project.id ? "text" : "unset",
+                        WebkitBackgroundClip: hoveredCard === project.id ? "text" : "unset",
+                      }}
+                    >
+                      {project.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+                      {project.description}
+                    </p>
+
+                    {/* Tech Stack - Border changes on hover */}
+                    <div className="flex flex-wrap gap-2">
+                      {project.tech.map((tech, i) => (
+                        <motion.span
+                          key={tech}
+                          className="px-3 py-1.5 rounded-lg text-xs font-mono transition-all duration-300"
+                          style={{
+                            backgroundColor: hoveredCard === project.id ? "rgba(6, 182, 212, 0.1)" : "rgba(255,255,255,0.05)",
+                            borderColor: hoveredCard === project.id ? "rgba(6, 182, 212, 0.5)" : "rgba(255,255,255,0.1)",
+                            color: hoveredCard === project.id ? "#22d3ee" : "#9ca3af",
+                            borderWidth: "1px",
+                            borderStyle: "solid",
+                          }}
+                          whileHover={{ y: -2 }}
+                          initial={{ opacity: 0, scale: 0 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: i * 0.1 }}
+                        >
+                          {tech}
+                        </motion.span>
+                      ))}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4 pt-4 flex-wrap">
+                      <motion.a
+                        href={project.liveLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative px-6 py-3 rounded-full text-white font-semibold overflow-hidden transition-all duration-300"
+                        style={{
+                          background: hoveredCard === project.id 
+                            ? "linear-gradient(135deg, #06b6d4, #3b82f6)" 
+                            : "linear-gradient(135deg, #3b82f6, #06b6d4)",
+                          boxShadow: hoveredCard === project.id 
+                            ? "0 0 20px rgba(6, 182, 212, 0.5)" 
+                            : "none",
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <span className="relative z-10">Live Demo</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                      </motion.a>
+                      
+                      <motion.a
+                        href={project.codeLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2"
+                        style={{
+                          borderColor: hoveredCard === project.id ? "rgba(6, 182, 212, 0.5)" : "rgba(255,255,255,0.2)",
+                          color: hoveredCard === project.id ? "#22d3ee" : "white",
+                          borderWidth: "1px",
+                          borderStyle: "solid",
+                          backgroundColor: hoveredCard === project.id ? "rgba(6, 182, 212, 0.1)" : "transparent",
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                        </svg>
+                        Code
+                      </motion.a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Bar - Cyan on hover */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+                  <div
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: `${scrollProgress * 100}%`,
+                      background: hoveredCard === project.id 
+                        ? "linear-gradient(90deg, #06b6d4, #22d3ee)"
+                        : "linear-gradient(90deg, #3b82f6, #06b6d4)",
+                    }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigation Dots */}
+      <div className="relative z-10 flex justify-center gap-3 mt-8">
+        {projects.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              const container = containerRef.current;
+              if (container) {
+                container.scrollTo({
+                  left: idx * (window.innerWidth - 100),
+                  behavior: "smooth",
+                });
+              }
             }}
+            className="group"
           >
-            Get in Touch
-            <ArrowRight className="w-4 h-4" />
-          </a>
-        </div> */}
-     
+            <div
+              className={`h-2 rounded-full transition-all duration-300 ${
+                activeSlide === idx
+                  ? "w-8 bg-gradient-to-r from-blue-500 to-cyan-500"
+                  : "w-2 bg-white/30 group-hover:bg-cyan-400/50"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+
+      {/* CTA Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="relative z-10 mt-20 max-w-4xl mx-auto text-center"
+      >
+        
+      </motion.div>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 };
-
 /* Project Card Content Component - Original size preserved */
 const ProjectCardContent = ({ project, index, isFirst }) => {
   return (
