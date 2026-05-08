@@ -2088,7 +2088,7 @@ const Projects = () => {
       </div>
 
       {/* CTA - Reduced padding */}
-      <div
+      {/* <div
         className={`relative z-10 py-16 px-4 text-center transition-all duration-1000 ${
           isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
         }`}
@@ -2119,8 +2119,8 @@ const Projects = () => {
             Get in Touch
             <ArrowRight className="w-4 h-4" />
           </a>
-        </div>
-      </div>
+        </div> */}
+     
     </section>
   );
 };
@@ -2624,7 +2624,7 @@ const GradientTrailCursor = () => {
       <style>{`* { cursor: none !important; }`}</style>
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 pointer-events-none z-[10000] w-4 h-4 rounded-full bg-gradient-to-r from-green-400 to-cyan-400 shadow-lg"
+        className="fixed top-0 left-0 pointer-events-none z-[10000] w-4 h-4 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 shadow-lg"
         style={{
           transform: "translate(-50%, -50%)",
           willChange: "transform, left, top",
