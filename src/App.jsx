@@ -976,7 +976,7 @@ const Hero = () => {
               {/* "Hi, I'm Ansif" — your original exact classes */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-gray-200">
                 Hi, I'm{" "}
-                <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
+                <span className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
                   Ansif
                 </span>
               </h1>
@@ -1125,13 +1125,13 @@ const About = () => {
               <p className="text-lg md:text-xl text-gray-200 leading-relaxed font-light">
                 More{" "}
                 <span className="text-blue-400 font-semibold">About </span>
-                <span className="text-blue-400 font-semibold">Me</span> — Along
+                <span className="text-blue-400 font-semibold">Me</span>  Along
                 with my technical expertise, I bring strong communication and
                 presentation skills. I'm a self-motivated learner who constantly
                 explores new tools and technologies to stay updated in the
                 ever-evolving web development landscape. I completed my Bachelor
                 of Computer Applications (BCA) from Calicut University. This is
-                a brief overview of my journey — thanks for taking the time to
+                a brief overview of my journey   thanks for taking the time to
                 read!
               </p>
               <div
@@ -2010,7 +2010,7 @@ const Projects = () => {
     },
     {
       id: 2,
-      title: "Zayk",
+      title: "Zayq Case",
       subtitle: "Task Management App",
       description:
         "Mobile-first task management app with intuitive drag-and-drop UI and seamless performance across all devices.",
@@ -2056,7 +2056,7 @@ const Projects = () => {
             </span>
           </h2>
           <div className="flex justify-center gap-2 mt-6">
-            {[...Array(3)].map((_, i) => (
+            {[...Array(2)].map((_, i) => (
               <div
                 key={i}
                 className="w-2 h-2 rounded-full transition-all duration-300"
@@ -2680,7 +2680,7 @@ export const Contact = () => {
 
                 <div>
                   <label htmlFor="message" className="block text-xs text-gray-500 uppercase tracking-widest mb-2">
-                    Message <span className="text-cyan-400">*</span>
+                    Message <span className="text-cyan-400"></span>
                   </label>
                   <textarea
                     id="message"
@@ -2706,7 +2706,7 @@ export const Contact = () => {
                 </button>
 
                 <p className="text-xs text-gray-600 text-center">
-                  I'll get back to you within 24 hours ✨
+                  I'll get back to you within 24 hours 
                 </p>
               </form>
             </div>
@@ -2794,7 +2794,7 @@ const GradientTrailCursor = () => {
 
   const spawnParticle = (x, y) => {
     const particle = document.createElement("div");
-    const colors = ["#34d399", "#22d3ee", "#a78bfa", "#f472b6"];
+    const colors = ["#1e40af", "#2563eb", "#38bdf8", "#7dd3fc"];
     const color = colors[Math.floor(Math.random() * colors.length)];
     particle.className = "fixed pointer-events-none z-[9999] rounded-full";
     particle.style.left = `${x}px`;
