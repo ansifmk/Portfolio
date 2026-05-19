@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from 'react';
+import { CircularTestimonials } from './components/ui/circular-testimonials';
+import SkillGalaxy, { CardProvider, CardGalaxy, CardModal } from "./components/ui/3d-skill-gallery";
+import { OrbitControls, Environment } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { gsap } from "gsap";
 import {
   AnimatePresence,
@@ -1180,239 +1184,261 @@ const About = () => {
   );
 };
 
+function CameraZoom({ targetZ }) {
+  const { camera } = useThree();
+  useFrame(() => {
+    camera.position.z += (targetZ - camera.position.z) * 0.08;
+    camera.updateProjectionMatrix();
+  });
+  return null;
+}
+
+function SkillGalaxyWithCamera({ skills, cameraZ }) {
+  return (
+    <div style={{
+      width: "100%",
+      height: "100%",
+      position: "relative",
+      overflow: "hidden",
+      background: "transparent",
+    }}>
+      <CardProvider cards={skills}>
+        <Canvas
+          camera={{ position: [0, 0, 70], fov: 60 }}
+          style={{ position: "absolute", inset: 0, zIndex: 10 }}
+          gl={{ alpha: true, antialias: true }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
+            gl.domElement.style.pointerEvents = "auto";
+          }}
+        >
+          <Suspense fallback={null}>
+            <CameraZoom targetZ={cameraZ} />
+            <Environment preset="night" />
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 10, 10]} intensity={0.8} color="#38bdf8" />
+            <pointLight position={[-10, -10, -10]} intensity={0.4} color="#0ea5e9" />
+            <CardGalaxy cards={skills} />
+            <OrbitControls
+              enablePan
+              enableZoom={false}
+              enableRotate
+              autoRotate
+              autoRotateSpeed={0.4}
+              rotateSpeed={0.5}
+              target={[0, 0, 0]}
+            />
+          </Suspense>
+        </Canvas>
+        <CardModal />
+      </CardProvider>
+    </div>
+  );
+}
+
 const Skills = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const [zoomProgress, setZoomProgress] = useState(0);
 
   const skills = [
     {
-      name: "HTML5",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
+      id: "1", title: "HTML5", alt: "HTML5",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
+      description: "Markup language for structuring web content.",
+      tags: ["Frontend", "Web"],
     },
     {
-      name: "CSS3",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg",
+      id: "2", title: "CSS3", alt: "CSS3",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg",
+      description: "Styling language for designing web pages.",
+      tags: ["Frontend", "Styling"],
     },
     {
-      name: "JavaScript",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+      id: "3", title: "JavaScript", alt: "JavaScript",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+      description: "Core scripting language of the web.",
+      tags: ["Frontend", "Backend"],
     },
     {
-      name: "React",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+      id: "4", title: "React", alt: "React",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+      description: "UI library for building component-based apps.",
+      tags: ["Frontend", "Library"],
     },
     {
-      name: "Tailwind CSS",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
+      id: "5", title: "Tailwind CSS", alt: "Tailwind CSS",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
+      description: "Utility-first CSS framework.",
+      tags: ["Frontend", "Styling"],
     },
     {
-      name: "Bootstrap",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bootstrap/bootstrap-original.svg",
+      id: "6", title: "Bootstrap", alt: "Bootstrap",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bootstrap/bootstrap-original.svg",
+      description: "Popular CSS component framework.",
+      tags: ["Frontend", "Styling"],
     },
     {
-      name: "C#",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/csharp/csharp-original.svg",
+      id: "7", title: "C#", alt: "C#",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/csharp/csharp-original.svg",
+      description: "Object-oriented language for .NET development.",
+      tags: ["Backend", "Language"],
     },
     {
-      name: ".NET",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dot-net/dot-net-original.svg",
+      id: "8", title: ".NET", alt: ".NET",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dot-net/dot-net-original.svg",
+      description: "Microsoft framework for building apps.",
+      tags: ["Backend", "Framework"],
     },
     {
-      name: "SQL Server",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/microsoftsqlserver/microsoftsqlserver-plain.svg",
+      id: "9", title: "SQL Server", alt: "SQL Server",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/microsoftsqlserver/microsoftsqlserver-plain.svg",
+      description: "Relational database management system.",
+      tags: ["Database", "Backend"],
     },
     {
-      name: "Git",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
+      id: "10", title: "Git", alt: "Git",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
+      description: "Version control system for tracking code changes.",
+      tags: ["DevOps", "Tools"],
     },
     {
-      name: "Figma",
-      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg",
+      id: "11", title: "Figma", alt: "Figma",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg",
+      description: "Collaborative UI/UX design tool.",
+      tags: ["Design", "Tools"],
     },
     {
-  name: "ADO.NET",
-  logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dot-net/dot-net-original.svg",
-},
-{
-  name: "EF Core",
-  logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg",
-},
-{
-  name: "Redux",
-  logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redux/redux-original.svg",
-}
-  ];
-
-  // Unique fly-in origin for each card (from different screen edges/corners)
-  const flyOrigins = [
-    { x: -300, y: -200, rotate: -25 },
-    { x: 300, y: -250, rotate: 20 },
-    { x: -350, y: 100, rotate: -15 },
-    { x: 400, y: -150, rotate: 30 },
-    { x: -200, y: 300, rotate: -20 },
-    { x: 250, y: 280, rotate: 15 },
-    { x: -400, y: -100, rotate: -30 },
-    { x: 350, y: 200, rotate: 25 },
-    { x: -150, y: -300, rotate: -10 },
-    { x: 200, y: -280, rotate: 18 },
-    { x: -300, y: 250, rotate: -22 },
-      { x: 320, y: -180, rotate: 16 },
-  { x: -260, y: 220, rotate: -18 },
-  { x: 180, y: 320, rotate: 12 },
-  ];
-
-  // Each card gets a unique float animation timing so they all move independently
-  const floatConfig = [
-    { duration: 3.2, delay: 0.0, yRange: 10 },
-    { duration: 2.8, delay: 0.4, yRange: 14 },
-    { duration: 3.6, delay: 0.8, yRange: 8  },
-    { duration: 2.5, delay: 0.2, yRange: 12 },
-    { duration: 3.9, delay: 0.6, yRange: 16 },
-    { duration: 2.7, delay: 1.0, yRange: 10 },
-    { duration: 3.3, delay: 0.3, yRange: 13 },
-    { duration: 2.9, delay: 0.7, yRange: 9  },
-    { duration: 3.7, delay: 0.1, yRange: 15 },
-    { duration: 2.6, delay: 0.9, yRange: 11 },
-    { duration: 3.1, delay: 0.5, yRange: 14 },
-     { duration: 3.4, delay: 0.2, yRange: 12 },
-  { duration: 2.9, delay: 0.6, yRange: 10 },
-  { duration: 3.5, delay: 0.4, yRange: 15 },
+      id: "12", title: "Redux", alt: "Redux",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redux/redux-original.svg",
+      description: "State management library for React.",
+      tags: ["Frontend", "State"],
+    },
+    {
+      id: "13", title: "ADO.NET", alt: "ADO.NET",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dot-net/dot-net-original.svg",
+      description: "Data access technology for .NET applications.",
+      tags: ["Backend", "Database"],
+    },
+    {
+      id: "14", title: "EF Core", alt: "EF Core",
+      imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg",
+      description: "ORM framework for .NET Core applications.",
+      tags: ["Backend", "ORM"],
+    },
   ];
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setIsVisible(entry.isIntersecting);
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px" },
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => {
-      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    const handleScroll = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const sectionTop = rect.top;
+      const sectionHeight = rect.height;
+      const windowHeight = window.innerHeight;
+
+      // scrollZoneHeight is the extra scroll space (200vh - 100vh = 100vh)
+      const scrollZoneHeight = sectionHeight - windowHeight;
+
+      // How far we've scrolled into the sticky zone
+      // sectionTop goes from 0 to -scrollZoneHeight as we scroll through
+      const scrolled = -sectionTop;
+      const progress = Math.min(Math.max(scrolled / scrollZoneHeight, 0), 1);
+
+      setZoomProgress(progress);
     };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // run on mount
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const startZ = 70;
+  const endZ = 12;
+  const cameraZ = startZ - (startZ - endZ) * zoomProgress;
+  const headingOpacity = zoomProgress > 0.4 ? (zoomProgress - 0.4) / 0.6 : 0;
+  const contentOpacity = zoomProgress * 1.5 > 1 ? 1 : zoomProgress * 1.5;
+
   return (
+    // 200vh height gives us 100vh of scroll room while sticky
     <section
       id="skills"
       ref={sectionRef}
-      className="bg-[#080d1a] min-h-screen flex items-center justify-center relative overflow-hidden py-20 px-4"
+      className="bg-[#080d1a]"
+      style={{ height: "200vh", position: "relative" }}
     >
-      {/* Same glow blobs as Hero */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-72 h-72 md:w-[28rem] md:h-[28rem] bg-cyan-500/15 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "1s" }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 md:w-[32rem] md:h-[32rem] bg-blue-400/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "2s" }}
-        />
-      </div>
-
-      <div className="relative z-10 w-full max-w-5xl mx-auto">
-        {/* Heading */}
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 bg-clip-text text-transparent drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
-            My Skills
-          </h2>
+      {/* Sticky wrapper — stays in view for the full 200vh scroll */}
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          width: "100%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* Glow blobs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
           <div
-            className={`h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 rounded-full mx-auto mt-4 transition-all duration-1000 ${
-              isVisible ? "w-32 opacity-100" : "w-0 opacity-0"
-            }`}
-            style={{ transitionDelay: "200ms" }}
+            className="absolute bottom-1/4 right-1/4 w-72 h-72 md:w-[28rem] md:h-[28rem] bg-cyan-500/15 rounded-full blur-3xl animate-pulse"
+            style={{ animationDelay: "1s" }}
+          />
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 md:w-[32rem] md:h-[32rem] bg-blue-400/10 rounded-full blur-3xl animate-pulse"
+            style={{ animationDelay: "2s" }}
           />
         </div>
 
-        {/* Skills grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 md:gap-6">
-          {skills.map((skill, index) => {
-            const origin = flyOrigins[index];
-            const float = floatConfig[index];
-
-            return (
-              <div
-                key={skill.name}
-                className="transition-all ease-out"
-                style={{
-                  transitionDuration: `${700 + index * 60}ms`,
-                  transitionDelay: isVisible ? `${index * 70}ms` : "0ms",
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible
-                    ? "translate(0px, 0px) rotate(0deg) scale(1)"
-                    : `translate(${origin.x}px, ${origin.y}px) rotate(${origin.rotate}deg) scale(0.4)`,
-                }}
-              >
-                {/* Floating wrapper — CSS keyframe animation per card */}
-                <div
-                  style={{
-                    animation: isVisible
-                      ? `float-${index} ${float.duration}s ease-in-out ${float.delay}s infinite alternate`
-                      : "none",
-                  }}
-                >
-                  <div className="group relative flex flex-col items-center justify-center gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 md:p-5 aspect-square hover:border-cyan-400/50 hover:bg-cyan-500/10 hover:shadow-[0_0_28px_rgba(34,211,238,0.25)] transition-colors duration-300 cursor-pointer overflow-hidden">
-
-                    {/* Inner shimmer on hover */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl bg-gradient-to-br from-white/5 via-cyan-300/10 to-transparent" />
-
-                    {/* Glowing dot top-right */}
-                    <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-cyan-400 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_6px_rgba(34,211,238,0.9)]" />
-
-                    <img
-                      src={skill.logo}
-                      alt={skill.name}
-                      className="w-10 h-10 md:w-12 md:h-12 object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-115 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
-                      loading="lazy"
-                    />
-                    <span className="text-xs md:text-sm font-medium text-gray-300 group-hover:text-cyan-300 transition-colors duration-300 text-center leading-tight">
-                      {skill.name}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom text */}
+        {/* Heading */}
         <div
-          className={`text-center mt-14 transition-all duration-1000 ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-          style={{ transitionDelay: isVisible ? "900ms" : "0ms" }}
+          style={{
+            position: "absolute",
+            top: "32px",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zIndex: 20,
+            opacity: headingOpacity,
+            transform: `translateY(${(1 - headingOpacity) * 24}px)`,
+            pointerEvents: "none",
+          }}
         >
-          <p className="text-gray-400 text-base md:text-lg">
-            Always learning and expanding my toolkit
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 bg-clip-text text-transparent">
+            My Skills
+          </h2>
+          <div
+            style={{
+              height: "4px",
+              background: "linear-gradient(to right, #1e40af, #3b82f6, #93c5fd)",
+              borderRadius: "999px",
+              margin: "12px auto 0",
+              width: `${headingOpacity * 128}px`,
+            }}
+          />
+          <p style={{ marginTop: "12px", color: "#94a3b8", fontSize: "14px" }}>
+            Drag to explore • Scroll to zoom • Click a skill to learn more
           </p>
         </div>
-      </div>
 
-      {/* Per-card float keyframes — each card bobs independently */}
-      <style>{`
-        ${skills
-          .map(
-            (_, i) => `
-          @keyframes float-${i} {
-            0%   { transform: translateY(0px) rotate(0deg); }
-            50%  { transform: translateY(-${floatConfig[i].yRange}px) rotate(${i % 2 === 0 ? 1.5 : -1.5}deg); }
-            100% { transform: translateY(-${floatConfig[i].yRange * 0.4}px) rotate(0deg); }
-          }
-        `
-          )
-          .join("")}
-      `}</style>
+        {/* 3D Canvas */}
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            opacity: contentOpacity,
+          }}
+        >
+          <SkillGalaxyWithCamera skills={skills} cameraZ={cameraZ} />
+        </div>
+      </div>
     </section>
   );
 };
-
 const Journey = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
@@ -1716,14 +1742,12 @@ const ChromaGrid = ({
 };
 const Gallery = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef(null);
-  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1 },
+      { threshold: 0.1 }
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => {
@@ -1731,111 +1755,37 @@ const Gallery = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || !isMobile) return;
-
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-
-    const handleMouseDown = (e) => {
-      isDown = true;
-      startX = e.pageX - container.offsetLeft;
-      scrollLeft = container.scrollLeft;
-      container.style.cursor = "grabbing";
-    };
-    const handleMouseLeave = () => {
-      isDown = false;
-      container.style.cursor = "grab";
-    };
-    const handleMouseUp = () => {
-      isDown = false;
-      container.style.cursor = "grab";
-    };
-    const handleMouseMove = (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const walk = (x - startX) * 2;
-      container.scrollLeft = scrollLeft - walk;
-    };
-    const handleTouchStart = (e) => {
-      isDown = true;
-      startX = e.touches[0].pageX - container.offsetLeft;
-      scrollLeft = container.scrollLeft;
-    };
-    const handleTouchMove = (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.touches[0].pageX - container.offsetLeft;
-      const walk = (x - startX) * 2;
-      container.scrollLeft = scrollLeft - walk;
-    };
-    const handleTouchEnd = () => {
-      isDown = false;
-    };
-
-    container.addEventListener("mousedown", handleMouseDown);
-    container.addEventListener("mouseleave", handleMouseLeave);
-    container.addEventListener("mouseup", handleMouseUp);
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("touchstart", handleTouchStart);
-    container.addEventListener("touchmove", handleTouchMove);
-    container.addEventListener("touchend", handleTouchEnd);
-    container.style.cursor = "grab";
-
-    return () => {
-      container.removeEventListener("mousedown", handleMouseDown);
-      container.removeEventListener("mouseleave", handleMouseLeave);
-      container.removeEventListener("mouseup", handleMouseUp);
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchmove", handleTouchMove);
-      container.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [isMobile]);
-
-  const galleryItems = [
-    {
-      images: [topic, topics],
-      title: "Topic presentation",
-      subtitle: "",
-      borderColor: "#3B82F6",
-      gradient: "linear-gradient(180deg, #3B82F6, #000)",
-    },
-    {
-      images: [quates, quate],
-      title: "Morning Section",
-      subtitle: "",
-      borderColor: "#F59E0B",
-      gradient: "linear-gradient(165deg, #F59E0B, #000)",
-    },
-    {
-      images: [intro, introduction],
-      title: "Self Introduction",
-      subtitle: "",
-      borderColor: "#3B82F6",
-      gradient: "linear-gradient(165deg, #3B82F6, #000)",
-    },
+  const galleryTestimonials = [
+   {
+  quote:
+    "Presentation on comparison topics — discussing key differences, insights, and real-world perspectives.",
+  name: "Topic Presentation",
+  designation: "Morning Session",
+  src: topic,
+},
+{
+  quote:
+    'Morning session presentation on the topic "Why People Procrastinate" with interactive discussion and idea sharing.',
+  name: "Topic Presentation",
+  designation: "Morning Session",
+  src: quates,
+},
+{
+  quote:
+    "Self introduction session about myself, my background, skills, interests, and career goals.",
+  name: "Self Introduction",
+  designation: "Morning Session",
+  src: intro,
+},
   ];
 
   return (
     <section
       id="gallery"
       ref={sectionRef}
-      className="bg-[#080d1a] flex items-center justify-center relative overflow-hidden py-12 md:py-20 px-4"
+      className="bg-[#080d1a] flex flex-col items-center justify-center relative overflow-hidden py-12 md:py-20 px-4"
     >
-      {/* Same glow blobs as Hero */}
+      {/* Glow blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
         <div
@@ -1848,105 +1798,50 @@ const Gallery = () => {
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto">
-        {/* Heading */}
+      {/* ── Heading ── */}
+      <div
+        className={`relative z-10 text-center mb-8 md:mb-14 transition-all duration-1000 ${
+          isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+        }`}
+      >
+        <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 bg-clip-text text-transparent">
+          Gallery
+        </h2>
+        <p className="mt-3 md:mt-4 text-sm md:text-lg text-gray-300 max-w-xl mx-auto">
+          A visual tour of my work and inspirations
+        </p>
         <div
-          className={`text-center mb-8 md:mb-16 transition-all duration-1000 ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          className={`h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 rounded-full mx-auto mt-3 md:mt-4 transition-all duration-1000 ${
+            isVisible ? "w-24 sm:w-32 opacity-100" : "w-0 opacity-0"
           }`}
-        >
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 bg-clip-text text-transparent">
-            Gallery
-          </h2>
-          <p className="mt-3 md:mt-4 text-sm md:text-lg text-gray-300 max-w-xl mx-auto px-4">
-            A visual tour of my work and inspirations
-          </p>
-          <div
-            className={`h-1 bg-gradient-to-r from-blue-800 via-blue-500 to-blue-300 rounded-full mx-auto mt-3 md:mt-4 transition-all duration-1000 ${
-              isVisible ? "w-24 sm:w-32 opacity-100" : "w-0 opacity-0"
-            }`}
-            style={{ transitionDelay: "200ms" }}
-          />
-        </div>
+          style={{ transitionDelay: "200ms" }}
+        />
+      </div>
 
-        {/* Scroll Indicator for Mobile */}
-        {isMobile && (
-          <div className="flex justify-center items-center gap-2 mb-4 md:hidden">
-            <div className="text-xs text-blue-400/70 animate-pulse">
-              ← Swipe to scroll →
-            </div>
-            <div className="flex gap-1">
-              <div className="w-1 h-1 rounded-full bg-blue-400/50"></div>
-              <div className="w-1 h-1 rounded-full bg-blue-400/50"></div>
-              <div className="w-1 h-1 rounded-full bg-blue-400/50"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Scrollable Container */}
-        <div
-          ref={scrollContainerRef}
-          className={`w-full ${
-            isMobile
-              ? "overflow-x-auto scroll-smooth hide-scrollbar"
-              : "overflow-x-auto md:overflow-visible"
-          }`}
-        >
-          <div className={`${isMobile ? "flex gap-4 w-max px-2" : "w-full"}`}>
-            {isMobile ? (
-              galleryItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="w-[280px] sm:w-[320px] flex-shrink-0 transform transition-all duration-300 hover:scale-105"
-                >
-                  <div className="bg-gradient-to-br from-blue-900/20 to-transparent backdrop-blur-sm border border-blue-500/20 rounded-2xl overflow-hidden hover:border-blue-400/60 transition-all duration-300">
-                    <div className="relative w-full aspect-[4/5] overflow-hidden">
-                      <img
-                        src={item.images[0]}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-white mb-1">
-                        {item.title}
-                      </h3>
-                      {item.subtitle && (
-                        <p className="text-sm text-gray-400">{item.subtitle}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <ChromaGrid
-                items={galleryItems}
-                radius={200}
-                damping={0.45}
-                fadeOut={0.6}
-                ease="power3.out"
-                className="!flex !justify-center"
-              />
-            )}
-          </div>
-        </div>
-
-        <style jsx>{`
-          .hide-scrollbar::-webkit-scrollbar {
-            height: 4px;
-          }
-          .hide-scrollbar::-webkit-scrollbar-track {
-            background: rgba(34, 197, 94, 0.1);
-            border-radius: 10px;
-          }
-          .hide-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(34, 197, 94, 0.5);
-            border-radius: 10px;
-          }
-          .hide-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(34, 197, 94, 0.8);
-          }
-        `}</style>
+      {/* ── CircularTestimonials ── */}
+      <div
+        className={`relative z-10 w-full flex items-center justify-center transition-all duration-1000 ${
+          isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+        }`}
+        style={{ transitionDelay: "300ms" }}
+      >
+        <CircularTestimonials
+          testimonials={galleryTestimonials}
+          autoplay={true}
+          colors={{
+            name: "#f7f7ff",
+            designation: "#e1e1e1",
+            testimony: "#f1f1f7",
+            arrowBackground: "#0582CA",
+            arrowForeground: "#141414",
+            arrowHoverBackground: "#f7f7ff",
+          }}
+          fontSizes={{
+            name: "24px",
+            designation: "16px",
+            quote: "16px",
+          }}
+        />
       </div>
     </section>
   );

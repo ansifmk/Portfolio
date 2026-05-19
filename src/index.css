@@ -13,3 +13,17 @@
 .card-body:hover {
   transform: rotateY(10deg) rotateX(10deg);
 }
+
+[data-flow-section] .flow-art-container {
+  padding: 0 !important;
+  gap: 0 !important;
+  min-height: 100vh;
+}
+/* Ensure each section fills full viewport height */
+[data-flow-section] {
+  min-height: 100vh;
+}
+
+html {
+  scroll-behavior: smooth;
+}
